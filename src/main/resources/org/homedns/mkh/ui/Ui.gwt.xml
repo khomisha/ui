@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='Ui'>
+  <!-- Other module inherits                                      -->
+	<inherits name='com.gwtext.GwtExt'/>
+	<inherits name='com.gwtextux.GwtExtUx'/>
+	<inherits name='com.gwtextux.GridFilterPlugin'/>
+    <inherits name='org.homedns.mkh.dataservice.Dataservice'/>
+
+  <!-- Specify the app entry point class.                         -->
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='client'/>
+
+</module>
