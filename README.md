@@ -47,6 +47,11 @@ Any Maven based project can use it directly by adding the appropriate entries to
 Packaged jars can be downloaded directly from the [Releases page](https://github.com/khomisha/ui/releases).
 
 
+## Gwt-Ext Reference
+
+Detailed information can be found [here](http://gwt-ext.com/license/). Maven ready jars [here](https://github.com/khomisha/ui/tree/master/third-party)
+
+
 ## Contact
 
 * mkhodonov@gmail.com
