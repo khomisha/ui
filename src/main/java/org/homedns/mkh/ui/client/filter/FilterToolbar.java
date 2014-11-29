@@ -35,7 +35,8 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
  */
 public class FilterToolbar extends Toolbar {
 	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
-	private ToolbarButton _local;
+
+	private boolean _bRemoteFilterExecuted = false;
 	
 	/**
 	 * @param filter the filter object
@@ -46,39 +47,47 @@ public class FilterToolbar extends Toolbar {
 			CONSTANTS.applyFilter( ), 
 			new ButtonListenerAdapter( ) {
 				public void onClick( Button button, EventObject e ) {
+					_bRemoteFilterExecuted = true;
 					cmd.execute( );
 				}
 			}
 		);
-    	apply.setDisabled( true );
-    	addButton( apply );
+    	apply.disable( );
     	
     	ToolbarButton clear = new ToolbarButton( 
     		CONSTANTS.clear( ),
 			new ButtonListenerAdapter( ) {
 				public void onClick( Button button, EventObject e ) {
 					filter.clearFilters( );
-					if( _local.isPressed( ) ) {
+					if( _bRemoteFilterExecuted ) {
+						_bRemoteFilterExecuted = false;
 						cmd.execute( );
 					}
 				}
 			}
 		);
-    	addButton( clear );
     	
-    	_local = new ToolbarButton( 
-    		CONSTANTS.cacheFilter( ), 
-			new ButtonListenerAdapter( ) {
+    	ToolbarButton remote = new ToolbarButton( 
+        	CONSTANTS.cacheFilter( ), 
+    		new ButtonListenerAdapter( ) {
+				@Override
 				public void onClick( Button button, EventObject e ) {
 					apply.setDisabled( !button.isPressed( ) );
+					filter.setLocalFlag( !button.isPressed( ) );					
 					button.setText( 
 						button.isPressed( ) ? CONSTANTS.remoteFilter( ) : CONSTANTS.cacheFilter( ) 
 					);
 				}
-			}
-		);
-    	_local.setEnableToggle( true );
-    	addButton( _local );
+    		}
+    	);
+    	remote.setEnableToggle( true );
+    	addSpacer( );
+    	addButton( remote );
+    	addSeparator( );
+    	addButton( apply );
+    	addSeparator( );
+    	addButton( clear );
     	addFill( );		
 	}
 }
+

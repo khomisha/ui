@@ -13,7 +13,7 @@
 
   	<name>UI widgets library</name>
     <description>Gwt-Ext based UI widgets collection. It is ready for use with Dataservice Library (https://github.com/khomisha/dataservice) for building GWT applications</description>
-    <url>https://github.com/khomisha/ui</url>
+    <url>https://github.com/khomisha/ui.git</url>
 
     <licenses>
         <license>

@@ -28,7 +28,7 @@ import org.homedns.mkh.ui.client.CmdTypeItem;
 import org.homedns.mkh.ui.client.BaseMenu;
 import org.homedns.mkh.ui.client.event.SelectRowEvent;
 import org.homedns.mkh.ui.client.filter.Filter;
-import org.homedns.mkh.ui.client.filter.FilterContextMenu;
+import org.homedns.mkh.ui.client.filter.FilterToolbar;
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
@@ -38,7 +38,6 @@ import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.event.PanelListenerAdapter;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.RowSelectionModel;
-import com.gwtext.client.widgets.grid.event.GridHeaderListenerAdapter;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.grid.event.RowSelectionListenerAdapter;
 
@@ -76,20 +75,20 @@ public class GridImpl extends AbstractGridImpl {
 			grid.addPlugin( _filter );
 		}
 		if( ( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER ) ) {
-//			grid.setTopToolbar( new FilterToolbar( _filter ) );
-			final FilterContextMenu menu = new FilterContextMenu( _filter );
-			grid.addGridHeaderListener(
-				new GridHeaderListenerAdapter( ) {
-					public void onHeaderContextMenu( 
-						GridPanel grid,
-		                int colIndex,
-		                EventObject e
-		            ) {
-						e.stopEvent( );
-						menu.showAt( e.getXY( ) );
-					}
-				}
-			);
+			grid.setTopToolbar( new FilterToolbar( _filter ) );
+//			final FilterContextMenu menu = new FilterContextMenu( _filter );
+//			grid.addGridHeaderListener(
+//				new GridHeaderListenerAdapter( ) {
+//					public void onHeaderContextMenu( 
+//						GridPanel grid,
+//		                int colIndex,
+//		                EventObject e
+//		            ) {
+//						e.stopEvent( );
+//						menu.showAt( e.getXY( ) );
+//					}
+//				}
+//			);
 		}
 		if( grid instanceof Paging ) {
 			Paging pagingGrid = ( Paging )grid;
