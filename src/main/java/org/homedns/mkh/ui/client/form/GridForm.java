@@ -23,11 +23,11 @@ import org.homedns.mkh.dataservice.client.event.EventBus;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistry;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistryAdaptee;
 import org.homedns.mkh.dataservice.client.view.ViewDesc;
+import org.homedns.mkh.dataservice.shared.DeleteResponse;
 import org.homedns.mkh.dataservice.shared.InsertResponse;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Id;
 import org.homedns.mkh.dataservice.shared.UpdateResponse;
-import org.homedns.mkh.ui.client.CmdTypeItem;
 import org.homedns.mkh.ui.client.HasState;
 import org.homedns.mkh.ui.client.State;
 import org.homedns.mkh.ui.client.Transition;
@@ -40,9 +40,10 @@ import org.homedns.mkh.ui.client.event.SelectRowEvent.SelectRowHandler;
 import com.google.gwt.user.client.Command;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.data.Record;
+import com.gwtext.client.data.Store;
 import com.gwtext.client.widgets.Container;
 import com.gwtext.client.widgets.form.event.FormPanelListenerAdapter;
-import org.homedns.mkh.ui.client.cache.WidgetStore;
 
 /**
  * Form for view/edit grid records
@@ -52,18 +53,20 @@ import org.homedns.mkh.ui.client.cache.WidgetStore;
 public class GridForm extends BoundForm implements SelectRowHandler, HasState, HandlerRegistry {
 	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
 
-	private HandlerRegistryAdaptee _handlers;
-	private State _state = States.NO_STATE;
-	private Transition _transition;
+	private HandlerRegistryAdaptee handlers;
+	private State state = States.READONLY;
+	private Transition transition;
+	private Command insertCmd, updateCmd;
 
 	/**
 	 * {@link org.homedns.mkh.ui.client.form.BoundForm}
 	 */
 	public GridForm( Id id, GridFormConfig cfg ) {
 		super( id, cfg );
-		_handlers = new HandlerRegistryAdaptee( );
+		setStoreListener( new GridFormCacheListener( ) );
+		handlers = new HandlerRegistryAdaptee( );
 		addHandler( 
-			EventBus.getInstance( ).addHandlerToSource( SelectRowEvent.TYPE, id.hashCode( ), this ) 
+			EventBus.getInstance( ).addHandlerToSource( SelectRowEvent.TYPE, id.getUID( ), this ) 
 		);
 	}
 
@@ -74,7 +77,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	protected void config( ) {
 		super.config( );
 		GridFormConfig cfg = ( GridFormConfig )getFormConfig( );
-		_transition = ( Transition )cfg.getAttribute( GridFormConfig.TRANSITION );
+		transition = ( Transition )cfg.getAttribute( GridFormConfig.TRANSITION );
 		changeStateTo( ( State )cfg.getAttribute( GridFormConfig.INIT_STATE ) );
 	}
 
@@ -84,6 +87,9 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	@Override
 	public void onSelectRow( SelectRowEvent event ) {
 		loadRecord( event.getRecord( ) );
+		if( getState( ) == States.NO_STATE ) {
+			changeStateTo( States.READONLY );
+		}
 	}
 
 	/**
@@ -91,13 +97,9 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public void init( ViewDesc desc ) {
-		setDescription( desc );
-		config( );
-		setReader( ( ( WidgetStore )getCache( ) ).getReader( ) );
-		Command cmd = getAfterInitCommand( );
-		if( cmd != null ) {
-			cmd.execute( );
-		}
+		super.init( desc );
+		insertCmd = CommandFactory.create( InsertCmd.class, this );
+		updateCmd = CommandFactory.create( UpdateCmd.class, this );
 		addListener(
 			new FormPanelListenerAdapter( ) {
 				@Override
@@ -112,39 +114,49 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 * @see org.homedns.mkh.ui.client.form.BaseForm#onButtonClick(org.homedns.mkh.ui.client.form.FormButton, com.gwtext.client.core.EventObject)
 	 */
 	@Override
-	protected void onButtonClick( FormButton button, EventObject e ) {
-		CmdTypeItem item = null;
+	protected void onButtonClick( FormButton button, EventObject e ) {	
+		int iSaveType = -1;
 		if( CONSTANTS.add( ).equals( button.getText( ) ) ) {
-			item = new CmdTypeItem( CONSTANTS.add( ), InsertCmd.class );
+			iSaveType = 0;
 			changeStateTo( States.ADD );
 		}
 		if( CONSTANTS.update( ).equals( button.getText( ) ) ) {
-			item = new CmdTypeItem( CONSTANTS.update( ), UpdateCmd.class );
+			iSaveType = 1;
 			changeStateTo( States.UPDATE );
 		}
 		if( CONSTANTS.cancel( ).equals( button.getText( ) ) ) {
 			changeStateTo( States.READONLY );
 		}
-		if( item != null ) {
-			getButtons( ).get( CONSTANTS.save( ) ).setCommand( 
-				CommandFactory.create( item.getCommandType( ), this ) 
-			);
+		if( iSaveType > -1 ) {
+			getButtons( ).get( CONSTANTS.save( ) ).setCommand( iSaveType == 0 ? insertCmd : updateCmd );
 		}
-		button.getCommand( ).execute( );
+		if( CONSTANTS.save( ).equals( button.getText( ) ) ) {
+			if( !getForm( ).isValid( ) ) {
+				return;
+			}
+		}
+		super.onButtonClick( button, e );
 	}
 
 	/**
-	 * @see org.homedns.mkh.ui.client.form.BoundForm#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.ui.client.form.BoundForm#onResponse(org.homedns.mkh.dataservice.shared.Response)
 	 */
 	@Override
-	public void refresh( Response data ) {
-		if( data == null ) {
+	public void onResponse( Response response ) {
+		if( response == null ) {
 			return;
 		}
-		if( data instanceof InsertResponse || data instanceof UpdateResponse ) {
-			if( data.getResult( ) == Response.SAVE_SUCCESS ) {
+		setResponse( response );
+		if( response instanceof InsertResponse || response instanceof UpdateResponse ) {
+			if( response.getResult( ) == Response.SAVE_SUCCESS ) {
 				changeStateTo( States.READONLY );
 			}			
+		}
+		if( response instanceof DeleteResponse ) {
+			if( response.getResult( ) == Response.SAVE_SUCCESS ) {
+				loadEmptyRecord( );
+				changeStateTo( States.NO_STATE );
+			}
 		}
 	}
 
@@ -153,7 +165,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public void removeHandlers( ) {
-		_handlers.clear( );
+		handlers.clear( );
 	}
 
 	/**
@@ -161,7 +173,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public boolean addHandler( HandlerRegistration hr ) {
-		return( _handlers.add( hr ) );		
+		return( handlers.add( hr ) );		
 	}
 
 	/**
@@ -169,7 +181,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public State getState( ) {
-		return( _state );
+		return( state );
 	}
 
 	/**
@@ -177,7 +189,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public void setState( State state ) {
-		_state = state;
+		this.state = state;
 	}
 
 	/**
@@ -185,7 +197,27 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	 */
 	@Override
 	public void changeStateTo( State newState ) {
-		_transition.doTransition( newState, this );
+		transition.doTransition( newState, this );
+	}
+	
+	protected class GridFormCacheListener extends CacheListener {
+		/**
+		 * @see org.homedns.mkh.ui.client.form.BoundForm.CacheListener#onLoad(com.gwtext.client.data.Store, com.gwtext.client.data.Record[])
+		 */
+		@Override
+		public void onLoad( Store store, Record[] records ) {
+		}
+
+		/**
+		 * @see org.homedns.mkh.ui.client.form.BoundForm.CacheListener#onDataChanged(com.gwtext.client.data.Store)
+		 */
+		@Override
+		public void onDataChanged( Store store ) {
+			super.onDataChanged( store );
+			if( store.getCount( ) < 1 ) {
+				changeStateTo( States.NO_STATE );				
+			}
+		}		
 	}
 }
 

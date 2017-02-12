@@ -19,6 +19,9 @@
 package org.homedns.mkh.ui.client.grid;
 
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
 import org.homedns.mkh.dataservice.client.Paging;
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.client.view.ViewCache;
@@ -26,14 +29,20 @@ import org.homedns.mkh.dataservice.shared.LoadPageRequest;
 import org.homedns.mkh.dataservice.shared.Request;
 import org.homedns.mkh.ui.client.CmdTypeItem;
 import org.homedns.mkh.ui.client.BaseMenu;
+import org.homedns.mkh.ui.client.HasButton;
+import org.homedns.mkh.ui.client.UIConstants;
+import org.homedns.mkh.ui.client.ViewToolbar;
+import org.homedns.mkh.ui.client.cache.WidgetStore;
 import org.homedns.mkh.ui.client.event.SelectRowEvent;
 import org.homedns.mkh.ui.client.filter.Filter;
-import org.homedns.mkh.ui.client.filter.FilterToolbar;
+
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.Record;
+import com.gwtext.client.data.SortState;
 import com.gwtext.client.data.Store;
-import com.gwtext.client.data.event.StoreListenerAdapter;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.event.PanelListenerAdapter;
 import com.gwtext.client.widgets.grid.GridPanel;
@@ -46,8 +55,11 @@ import com.gwtext.client.widgets.grid.event.RowSelectionListenerAdapter;
  *
  */
 public class GridImpl extends AbstractGridImpl {
-	private Filter _filter;
-	private BaseMenu _menu;
+	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
+	private static final Logger LOG = Logger.getLogger( GridImpl.class.getName( ) );  
+
+	private Filter filter;
+	private BaseMenu menu;
 	
 	/**
 	 * @param cfg
@@ -64,45 +76,44 @@ public class GridImpl extends AbstractGridImpl {
 	@Override
 	protected void config( ) {
 		super.config( );
-		final GridPanel grid = getGrid( );
+		final GridPanel grid = getGrid( ) ;
 		GridConfig cfg = getConfiguration( );
-//		grid.stripeRows( true );
+		grid.stripeRows( true );
 		if( 
 			( Boolean )cfg.getAttribute( GridConfig.FILTER ) || 
 			( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER ) 
 		) {
-			_filter = new Filter( ( ( View )grid ) );
-			grid.addPlugin( _filter );
+			filter = new Filter( ( ( View )grid ) );
+			grid.addPlugin( filter );
 		}
-		if( ( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER ) ) {
-			grid.setTopToolbar( new FilterToolbar( _filter ) );
-//			final FilterContextMenu menu = new FilterContextMenu( _filter );
-//			grid.addGridHeaderListener(
-//				new GridHeaderListenerAdapter( ) {
-//					public void onHeaderContextMenu( 
-//						GridPanel grid,
-//		                int colIndex,
-//		                EventObject e
-//		            ) {
-//						e.stopEvent( );
-//						menu.showAt( e.getXY( ) );
-//					}
-//				}
-//			);
-		}
-		if( grid instanceof Paging ) {
+//		setSort( );
+		boolean bRemoteFilter = ( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER );
+		if( isPaging( ) ) {
 			Paging pagingGrid = ( Paging )grid;
-			if( pagingGrid.getPageSize( ) > 0 ) {
-				final PagingToolbar pt = new PagingToolbar( pagingGrid );
-				grid.setBottomToolbar( pt );
-				pt.updateInfo( );
-				grid.getStore( ).addStoreListener( 
-					new StoreListenerAdapter( ) {
-						public void onLoad( Store store, Record[] records ) {
-							pt.updateInfo( );
-						}
-					}
+			PagingTBar ptbar = new PagingTBar( pagingGrid );
+			if( bRemoteFilter ) {
+				ptbar.addSeparator( );
+				ptbar.addButton( CONSTANTS.clear( ), null, null );
+				ptbar.addSeparator( );
+				ptbar.addButton( CONSTANTS.cacheFilter( ), null, new String[] { "toggle=true" } );				
+			}
+			grid.setBottomToolbar( ptbar );
+		} else {
+			if( !( Boolean )cfg.getAttribute( GridConfig.NO_TOOLBAR ) ) {
+				ViewToolbar vtbar = new ViewToolbar( ( HasButton )grid );
+				vtbar.addButton( 
+					null, 
+					RELOAD_BTN_ICON_CLS,
+					new String[] { "tooltip=" + CONSTANTS.refresh( ) } 
 				);
+				if( bRemoteFilter ) {
+					vtbar.addSeparator( );
+					vtbar.addButton( CONSTANTS.clear( ), null, null );
+					vtbar.addSeparator( );
+					vtbar.addButton( CONSTANTS.cacheFilter( ), null, new String[] { "toggle=true" } );				
+				}
+				vtbar.addFill( );
+				grid.setBottomToolbar( vtbar );
 			}
 		}
 		grid.setEnableColumnResize( ( Boolean )cfg.getAttribute( GridConfig.COL_RESIZE ) );
@@ -111,6 +122,7 @@ public class GridImpl extends AbstractGridImpl {
 		grid.addListener(
 			new PanelListenerAdapter( ) {
 				public void onRender( Component component ) {
+					LOG.config( ( ( View )grid ).getID( ).getName( ) + ": onRender: selectRow( 0 )" );
 					selectRow( 0 );
  				}
 			}
@@ -118,10 +130,30 @@ public class GridImpl extends AbstractGridImpl {
 		grid.getSelectionModel( ).addListener(
 			new RowSelectionListenerAdapter( ) {
 				public void onRowSelect( RowSelectionModel sm, int rowIndex, Record record ) {
+					LOG.config( ( ( View )grid ).getID( ).getName( ) + ": onRowSelect: selectRow(" + String.valueOf( rowIndex ) + ")" );
+					setSelectedRow( rowIndex );
 					SelectRowEvent.fire( ( ( View )grid ).getID( ), record );
 				}
 			}
 		);
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#onButtonClick(com.gwtext.client.widgets.Button, com.gwtext.client.core.EventObject)
+	 */
+	@Override
+	protected void onButtonClick( Button button, EventObject e ) {
+		super.onButtonClick( button, e );
+		if( CONSTANTS.clear( ).equals( button.getText( ) ) ) {
+			filter.clearFilters( );
+			reload( );
+		}
+		if( CONSTANTS.cacheFilter( ).equals( button.getText( ) ) ) {
+			filter.setLocalFlag( !button.isPressed( ) );					
+			button.setText( 
+				button.isPressed( ) ? CONSTANTS.remoteFilter( ) : CONSTANTS.cacheFilter( ) 
+			);				
+		}
 	}
 
 	/**
@@ -130,7 +162,7 @@ public class GridImpl extends AbstractGridImpl {
 	 * @return the context menu
 	 */
 	public BaseMenu getContextMenu( ) {
-		return( _menu );
+		return( menu );
 	}
 	
 	/**
@@ -143,7 +175,7 @@ public class GridImpl extends AbstractGridImpl {
 		if( items == null || items.isEmpty( ) ) {
 			return;
 		}
-		_menu = new BaseMenu( items, ( View )getGrid( ) );
+		menu = new BaseMenu( items, ( View )getGrid( ) );
 		getGrid( ).addGridRowListener(
 			new GridRowListenerAdapter( ) {
 				public void onRowContextMenu( 
@@ -152,19 +184,20 @@ public class GridImpl extends AbstractGridImpl {
 					final EventObject e 
 				) {
 					e.stopEvent( );
-					_menu.showAt( e.getXY( ) );
+					menu.showAt( e.getXY( ) );
 				}
 			}
 		);
 	}
 	
 	/**
-	 * Selects row in grid
-	 * 
-	 * @param iRow
-	 *            the row index
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#selectRow(int)
 	 */
 	protected void selectRow( int iRow ) {
+		WidgetStore store = ( WidgetStore )getCache( );
+		if( store.getRowCount( ) < 1 ) {
+			return;
+		}
 		getGrid( ).getSelectionModel( ).selectRow( iRow );
 	}
 	
@@ -174,8 +207,8 @@ public class GridImpl extends AbstractGridImpl {
 	@Override
 	protected String getCondition( ) {
 		String sCondition = null;
-		if( _filter != null ) {
-			sCondition = _filter.getCondition( );
+		if( filter != null ) {
+			sCondition = filter.getCondition( );
 		}
 		return( sCondition );
 	}
@@ -188,7 +221,9 @@ public class GridImpl extends AbstractGridImpl {
 		super.onSend( request );
 		if( request instanceof LoadPageRequest ) {
 			LoadPageRequest req = ( LoadPageRequest )request;
-			req.setLoadingPageNum( ( ( Paging )getGrid( ) ).getPage( ).getPageNumber( ) );
+			if( getGrid( ) instanceof Paging ) {
+				req.setLoadingPageNum( ( ( Paging )getGrid( ) ).getPage( ).getPageNumber( ) );
+			}
 		}
 	}
 
@@ -211,5 +246,33 @@ public class GridImpl extends AbstractGridImpl {
 	protected void setCache( ViewCache cache ) {
 		super.setCache( cache );
 		getGrid( ).setStore( ( Store )cache );
+	}
+	
+	/**
+	 * Sets sorts condition
+	 */
+	protected void setSort( ) {
+		GridConfig cfg = getConfiguration( );
+		String sSort = ( String )cfg.getAttribute( GridConfig.SORT );
+		if( sSort == null ) {
+			return;
+		}
+		String[] as = sSort.split( "," );
+		Store store = getGrid( ).getStore( );
+		SortDir sd = ( "A".equals( as[ 1 ] ) ) ? SortDir.ASC : SortDir.DESC;
+		store.setSortInfo( new SortState( as[ 0 ], sd ) );
+	}
+	
+	/**
+	 * Returns true if grid paging is on and false otherwise 
+	 * 
+	 * @return true if grid paging is on and false otherwise 
+	 */
+	private boolean isPaging( ) {
+		boolean bPaging = false;
+		if( getGrid( ) instanceof Paging ) {
+			bPaging = ( ( ( Paging )getGrid( ) ).getPageSize( ) > 0 );
+		}
+		return( bPaging );
 	}
 }

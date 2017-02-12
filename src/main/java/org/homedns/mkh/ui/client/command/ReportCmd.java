@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Mikhail Khodonov
+ * Copyright 2014 - 2016 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,18 +18,14 @@
 
 package org.homedns.mkh.ui.client.command;
 
-import org.homedns.mkh.dataservice.client.sender.RequestSender;
-import org.homedns.mkh.dataservice.client.sender.SendBinder;
-import org.homedns.mkh.dataservice.client.view.View;
+import org.homedns.mkh.dataservice.client.DirectRPCCall;
 import org.homedns.mkh.dataservice.shared.ReportRequest;
-import org.homedns.mkh.dataservice.shared.Request;
-import org.homedns.mkh.dataservice.shared.RequestFactory;
 
 /**
  * Report command
  *
  */
-public class ReportCmd extends GenericCommand< View > {
+public class ReportCmd extends GenericCommand< ReportRequest > {
 
 	public ReportCmd( ) {
 	}
@@ -39,10 +35,7 @@ public class ReportCmd extends GenericCommand< View > {
 	 */
 	@Override
 	public void execute( ) {
-		Request request = RequestFactory.create( ReportRequest.class );
-		request.setID( getParam( ).getID( ) );
-		RequestSender sender = SendBinder.bind( request );
-		sender.setView( getParam( ) );
-		sender.send( );
+		DirectRPCCall rpc = new DirectRPCCall( );
+		rpc.execute( getParam( ) );
 	}
 }

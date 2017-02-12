@@ -39,6 +39,7 @@ public class UpdateCmd extends GenericCommand< View > {
 	public void execute( ) {
 		UpdateRequest request = ( UpdateRequest )RequestFactory.create( UpdateRequest.class );
 		request.setID( getParam( ).getID( ) );
+		request.setBatchUpdate( getParam( ).isBatchUpdate( ) );
 		getParam( ).getSavingData( request );
 		SendBinder.bind( request ).send( );
 	}

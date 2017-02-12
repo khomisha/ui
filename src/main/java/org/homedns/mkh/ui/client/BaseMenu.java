@@ -36,14 +36,14 @@ public class BaseMenu extends Menu {
 	
 	public BaseMenu( ) {
 	}
-	
+
 	/**
 	 * @param items
 	 *            the menu items
 	 */
 	public BaseMenu( List< MenuItem > items ) {
 		for( MenuItem item : items ) {
-			addItem( item.getMenuItem( ) );
+			addItem( item );
 		}
 	}
 
@@ -70,5 +70,14 @@ public class BaseMenu extends Menu {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Adds menu item 
+	 * 
+	 * @param item the menu item to add
+	 */
+	public void addItem( MenuItem item ) {
+		super.addItem( item.getMenuItem( ) );
 	}
 }

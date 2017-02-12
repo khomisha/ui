@@ -20,6 +20,8 @@ package org.homedns.mkh.ui.client.cache;
 
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Type;
+import org.homedns.mkh.ui.client.form.FieldFactory;
+
 import com.gwtext.client.data.BooleanFieldDef;
 import com.gwtext.client.data.DateFieldDef;
 import com.gwtext.client.data.FieldDef;
@@ -56,7 +58,7 @@ public class FieldDefFactory {
 		} else if( type == Type.FLOAT || type == Type.DOUBLE ) {
 			fieldDef = new FloatFieldDef( sColName );
 		} else if( type == Type.TIMESTAMP ) {
-			fieldDef = new DateFieldDef( sColName, "Y-m-d H:i:s" );
+			fieldDef = new DateFieldDef( sColName, FieldFactory.TIMESTAMP_FMT );
 		} else if( type == Type.STRING ) {
 			fieldDef = new StringFieldDef( sColName );			
 		}

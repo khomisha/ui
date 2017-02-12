@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.homedns.mkh.dataservice.client.Type;
 import org.homedns.mkh.dataservice.client.view.View;
-import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Util;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.WidgetStore;
@@ -174,10 +173,10 @@ public class PropertyGridImpl extends AbstractGridImpl {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#refresh()
 	 */
 	@Override
-	protected void refresh( Response data ) {
+	protected void refresh( ) {
 		getGrid( ).getView( ).refresh( );
 	}
 
@@ -209,5 +208,12 @@ public class PropertyGridImpl extends AbstractGridImpl {
 	 */
 	private native void put2Map( JavaScriptObject map, String key, String value ) /*-{
 		map[key] = value;
-	}-*/;	
+	}-*/;
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#selectRow(int)
+	 */
+	@Override
+	protected void selectRow( int iRow ) {
+	}	
 }

@@ -18,6 +18,7 @@
 
 package org.homedns.mkh.ui.client.grid;
 
+import java.util.List;
 import org.homedns.mkh.dataservice.client.Page;
 import org.homedns.mkh.dataservice.client.Paging;
 import org.homedns.mkh.dataservice.client.event.RegisterViewEvent;
@@ -28,10 +29,14 @@ import org.homedns.mkh.dataservice.shared.Request;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Id;
 import org.homedns.mkh.ui.client.BaseMenu;
+import org.homedns.mkh.ui.client.HasButton;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.Pager;
 import org.homedns.mkh.ui.client.cache.PagerStore;
 import com.google.gwt.user.client.Command;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.data.Record;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.grid.EditorGridPanel;
 
 /**
@@ -39,11 +44,16 @@ import com.gwtext.client.widgets.grid.EditorGridPanel;
  *
  */
 @SuppressWarnings( "unchecked" )
-public class EditorGrid extends EditorGridPanel implements Paging {
-	private EditorGridImpl _impl;
-	private Id _id;
-	private WidgetDesc _desc;
-	private Class< ? > _cacheType = PagerStore.class;
+public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
+	public static final int REMOVED = 0;
+	public static final int ADDED = 1;
+	public static final int UPDATED = 2;
+
+	private EditorGridImpl impl;
+	private Id id;
+	private WidgetDesc desc;
+	private Class< ? > cacheType = PagerStore.class;
+	private boolean bBatch = false;
 	
 	/**
 	 * @param id
@@ -53,8 +63,8 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	public EditorGrid( Id id, EditorGridImpl impl ) {
 		setID( id );
-		_impl = impl;
-		_impl.setGrid( this );
+		setImplementation( impl );
+		impl.setGrid( this );
 		RegisterViewEvent.fire( this );
 	}
 
@@ -63,7 +73,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void setID( Id id ) {
-		_id = id;
+		this.id = id;
 	}
 
 	/**
@@ -71,7 +81,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public Id getID( ) {
-		return( _id );
+		return( id );
 	}
 
 	/**
@@ -79,8 +89,8 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void init( ViewDesc desc ) {
-		_desc = ( WidgetDesc )desc;
-		_impl.init( );
+		this.desc = ( WidgetDesc )desc;
+		impl.init( );
 	}
 
 	/**
@@ -88,7 +98,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public ViewDesc getDescription( ) {
-		return( _desc );
+		return( desc );
 	}
 
 	/**
@@ -96,7 +106,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void getSavingData( Request request ) {
-		_impl.getSavingData( request );
+		impl.getSavingData( request );
 	}
 
 	/**
@@ -104,7 +114,16 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public ViewCache getCache( ) {
-		return( _impl.getCache( ) );
+		return( impl.getCache( ) );
+	}
+
+	/**
+	 * Returns true if grid content has been changed and false otherwise
+	 * 
+	 * @return true or false
+	 */
+	public boolean isDirty( ) {
+		return( impl.isDirty( ) );
 	}
 
 	/**
@@ -112,15 +131,15 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public Request onInit( ) {
-		return( _impl.onInit( ) );
+		return( impl.onInit( ) );
 	}
 
 	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#refresh(org.homedns.mkh.dataservice.shared.Response)
 	 */
 	@Override
-	public void refresh( Response data ) {
-		_impl.refresh( data );
+	public void onResponse( Response response ) {
+		impl.onResponse( response );
 	}
 
 	/**
@@ -128,7 +147,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void setCache( ViewCache cache ) {
-		_impl.setCache( cache );
+		impl.setCache( cache );
 	}
 
 	/**
@@ -149,7 +168,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public int getPageSize( ) {
-		return( _desc.getDataBufferDesc( ).getTable( ).getPageSize( ) );
+		return( desc.getDataBufferDesc( ).getTable( ).getPageSize( ) );
 	}
 
 	/**
@@ -165,7 +184,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void onSend( Request request ) {
-		_impl.onSend( request );
+		impl.onSend( request );
 	}
 
 	/**
@@ -173,7 +192,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public Data getArgs( ) {
-		return( _impl.getArgs( ) );
+		return( impl.getArgs( ) );
 	}
 
 	/**
@@ -181,7 +200,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void setArgs( Data args ) {
-		_impl.setArgs( args );
+		impl.setArgs( args );
 	}
 
 	/**
@@ -197,7 +216,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public Class< ? > getCacheType( ) {
-		return( _cacheType );
+		return( cacheType );
 	}
 
 	/**
@@ -205,7 +224,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void setCacheType( Class< ? > cacheType ) {
-		_cacheType = cacheType;		
+		this.cacheType = cacheType;		
 	}
 	
 	/**
@@ -213,7 +232,7 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 */
 	@Override
 	public void setAfterInitCommand( Command cmd ) {
-		_impl.setAfterInitCommand( cmd );
+		impl.setAfterInitCommand( cmd );
 	}
 
 	/**
@@ -222,6 +241,159 @@ public class EditorGrid extends EditorGridPanel implements Paging {
 	 * @return the context menu or null
 	 */
 	public BaseMenu getContextMenu( ) {
-		return( _impl.getContextMenu( ) );
+		return( impl.getContextMenu( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#refresh()
+	 */
+	@Override
+	public void refresh( ) {
+		impl.refresh( );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#getResponse()
+	 */
+	@Override
+	public Response getResponse( ) {
+		return( impl.getResponse( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setResponse(org.homedns.mkh.dataservice.shared.Response)
+	 */
+	@Override
+	public void setResponse( Response response ) {
+		impl.setResponse( response );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#reload()
+	 */
+	@Override
+	public void reload( ) {
+		impl.reload( );		
+	}
+
+	/**
+	 * Returns removed records
+	 * 
+	 * @return the removed records
+	 */
+	public List< Record > getRemovedRecords( ) {
+		return( impl.getRemovedRecords( ) );
+	}
+
+	/**
+	 * Returns added records
+	 * 
+	 * @return the added records
+	 */
+	public List< Record > getAddedRecords( ) {
+		return( impl.getAddedRecords( ) );
+	}
+
+	/**
+	 * Returns updated records
+	 * 
+	 * @return the updated records
+	 */
+	public List< Record > getUpdatedRecords( ) {
+		return( impl.getUpdatedRecords( ) );
+	}
+
+	/**
+	 * Sets updated records
+	 * 
+	 * @param updatedRecords the updated records to set
+	 */
+	public void setUpdatedRecords( List< Record > updatedRecords ) {
+		impl.setUpdatedRecords( updatedRecords );
+	}
+
+	/**
+	 * Sets removed records
+	 * 
+	 * @param removedRecords the removed records to set
+	 */
+	public void setRemovedRecords( List< Record > removedRecords ) {
+		impl.setRemovedRecords( removedRecords );
+	}
+
+	/**
+	 * Sets added records
+	 * 
+	 * @param addedRecords the added records to set
+	 */
+	public void setAddedRecords( List< Record > addedRecords ) {
+		impl.setAddedRecords( addedRecords );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setBatchUpdate(boolean)
+	 */
+	@Override
+	public void setBatchUpdate( boolean bBatch ) {
+		this.bBatch = bBatch;
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isBatchUpdate()
+	 */
+	@Override
+	public boolean isBatchUpdate( ) {
+		return( bBatch );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.HasButton#onButtonClick(com.gwtext.client.widgets.Button, com.gwtext.client.core.EventObject)
+	 */
+	@Override
+	public void onButtonClick( Button button, EventObject e ) {
+		impl.onButtonClick( button, e );
+	}
+
+	/**
+	 * Returns implementation object
+	 * 
+	 * @return the implementation object
+	 */
+	protected AbstractGridImpl getImplementation( ) {
+		return( impl );
+	}
+
+	/**
+	 * Sets implementation object
+	 * 
+	 * @param impl the implementation object to set
+	 */
+	protected void setImplementation( AbstractGridImpl impl ) {
+		this.impl = ( EditorGridImpl )impl;
+	}
+	
+	/**
+	 * Removes specified records from specified type records list
+	 * 
+	 * @param iType
+	 *            the records list type
+	 *            {@link org.homedns.mkh.ui.client.grid.EditorGrid#REMOVED,
+	 *            org.homedns.mkh.ui.client.grid.EditorGrid#UPDATED,
+	 *            org.homedns.mkh.ui.client.grid.EditorGrid#ADDED}
+	 * @param record
+	 *            the record to remove
+	 */
+	public void removeFromRecords( int iType, Record record ) {
+		impl.removeFromRecords( iType, record );
+	}
+	
+	/**
+	 * Rejects all changes since last load
+	 */
+	public void rejectChanges( ) {
+		getStore( ).rejectChanges( );
+		getAddedRecords( ).clear( );
+		getUpdatedRecords( ).clear( );
+		getRemovedRecords( ).clear( );
 	}
 }

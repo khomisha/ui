@@ -99,7 +99,7 @@ public class ListBox extends ComboBox {
 		// so many amazing things in gwtext, general purpose Store
 		// doesn't work with combobox, only SimpleStore. All fields are treated as String!
 		int iRow = 0;
-		Object[][] a = new Object[ data.length ][ 2 ];
+		String[][] a = new String[ data.length ][ 2 ];
 		for( Value value : data ) {
 			a[ iRow ][ 0 ] = value.getDisplayValue( );
 			a[ iRow ][ 1 ] = value.getDataValue( );

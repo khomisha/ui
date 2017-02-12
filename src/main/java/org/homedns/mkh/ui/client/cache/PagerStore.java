@@ -27,17 +27,17 @@ import com.gwtext.client.data.DataProxy;
  *
  */
 public class PagerStore extends WidgetStore implements Pager {
-	private Page _page;
+	private Page page;
 
 	public PagerStore( ) {
-		_page = new Page( );
+		page = new Page( );
 	}
 
 	/**
 	 * @see org.homedns.mkh.ui.client.cache.Pager#loadPage(org.homedns.mkh.dataservice.client.Page)
 	 */
 	public void loadPage( Page page ) {
-		if( _page.getPageSize( ) == 0 ) {
+		if( page.getPageSize( ) == 0 ) {
 			load( );
 		} else {
 			load( page.getFirstRow( ), page.getPageSize( ) );
@@ -50,7 +50,7 @@ public class PagerStore extends WidgetStore implements Pager {
 	 * @return the page
 	 */
 	public Page getPage( ) {
-		return( _page );
+		return( page );
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class PagerStore extends WidgetStore implements Pager {
 	 * @param page the page to set
 	 */
 	public void setPage( Page page ) {
-		_page = page;
+		this.page = page;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class PagerStore extends WidgetStore implements Pager {
 	@Override
 	public void setRowCount( Integer iRowCount ) {
 		super.setRowCount( iRowCount );
-		_page.setRowCount( iRowCount );
+		page.setRowCount( iRowCount );
 	}
 
 	/**
@@ -77,7 +77,12 @@ public class PagerStore extends WidgetStore implements Pager {
 	@Override
 	protected void reload( JavaScriptObject data ) {
 		setDataProxy( createProxy( data ) );
-		loadPage( _page );
+//		loadPage( page );
+		if( page.getPageSize( ) == 0 ) {
+			load( );
+		} else {
+			load( 0, page.getPageSize( ) );
+		}
 	}
 
 	/**
@@ -86,7 +91,8 @@ public class PagerStore extends WidgetStore implements Pager {
 	@Override
 	protected void init( ) {
 		super.init( );
-		_page.setPageSize( getViewDesc( ).getDataBufferDesc( ).getTable( ).getPageSize( ) );
+		page.setPageSize( getViewDesc( ).getDataBufferDesc( ).getTable( ).getPageSize( ) );
+		setRemoteSort( true );
 	}
 
 	/**

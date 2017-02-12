@@ -188,7 +188,7 @@ public class WidgetStore extends Store implements ViewCache {
 	 * @param iRowCount the row count to set
 	 */
 	public void setRowCount( Integer iRowCount ) {
-		_iRowCount = ( iRowCount == null ) ? _iRowCount : iRowCount;
+		_iRowCount = iRowCount;
 	}
 	
 	/**
@@ -259,18 +259,34 @@ public class WidgetStore extends Store implements ViewCache {
 	 * Finds record index by primary key value (surrogate key)
 	 * 
 	 * @param pkValue
-	 *            the primary key value
+	 *            the return value object contains primary key value
 	 * 
 	 * @return the record index or -1
 	 */
 	public int getRecordByPK( ReturnValue pkValue ) {
-		String pk = _desc.getDataBufferDesc( ).getTable( ).getKey( );
-		int iIndex = find( 
-			pk, String.valueOf( pkValue.get( 0 ) ), 0, true, false 
-		);
-		return( iIndex );
+		if( pkValue.isEmpty( ) ) {
+			return( -1 );
+		}
+		return( getRecordByPK( pkValue.get( 0 ) ) );
 	}
 	
+	/**
+	 * Finds record index by primary key value (surrogate key)
+	 * 
+	 * @param sPKValue
+	 *            the primary key value
+	 * 
+	 * @return the record index or -1
+	 */
+	public int getRecordByPK( String sPKValue ) {
+		if( "".equals( sPKValue ) || sPKValue == null ) {
+			return( -1 );
+		}
+		String pk = _desc.getDataBufferDesc( ).getTable( ).getKey( );
+		int iIndex = find( pk, sPKValue, 0, true, false );
+		return( iIndex );
+	}
+
 	/**
 	 * Inits widget cache implementation specific objects. View description
 	 * object is already defined

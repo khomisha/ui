@@ -89,6 +89,7 @@ public class FormConfig extends WidgetConfig {
 		setAttribute( TRACK_ON_RESET, false );
 		setAttribute( BUTTON_ALIGN, Position.RIGHT );
 		setAttribute( LABEL_ALIGN, Position.RIGHT );
+		setAttribute( AUTO_SCROLL, false );
 		setAttribute( 
 			BUTTONS, 
 			new CmdTypeItem[] { 

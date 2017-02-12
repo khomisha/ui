@@ -49,7 +49,7 @@ public class SelectRowEvent extends GenericEvent< SelectRowEvent.SelectRowHandle
 	public static void fire( Id id, Record record ) {
 		SelectRowEvent event = new SelectRowEvent( );
 		event.setRecord( record );
-		fire( event, id.hashCode( ) );
+		fire( event, id.getUID( ) );
 	}
 
 	/**

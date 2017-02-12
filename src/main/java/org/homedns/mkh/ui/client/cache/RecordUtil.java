@@ -83,7 +83,7 @@ public class RecordUtil {
 	 * @return json data string
 	 */
 	public static String getJsonData( List< Record > records ) {
-		return( getJsonData( new Record[ records.size( ) ] ) );
+		return( getJsonData( records.toArray( new Record[ records.size( ) ] ) ) );
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class RecordUtil {
 	 * @return json data string
 	 */
 	public static String getJsonData( Record[] aRecord ) {
-		int iIndex = 0;
+		int iRecord = 0;
 		StringBuffer sb = new StringBuffer( );
 		try {
 			sb.append( "[" );
@@ -103,16 +103,18 @@ public class RecordUtil {
 				String s = getJson( rec.getJsObj( ) );
 				LOG.config( "json: " + s );
 				sb.append( s );
-				sb.append( "," );
-				iIndex++;
+				if( iRecord < aRecord.length - 1 ) {
+					sb.append( "," );
+				}
+				iRecord++;
 			}
-			sb.replace( sb.length( ) - 1, sb.length( ), "]" );
+			sb.append( "]" );
 			LOG.config( sb.toString( ) );
 		}
 		catch( Exception e ) {
 			LOG.log( 
 				Level.SEVERE, 
-				"record: " + RecordUtil.record2String( aRecord[ iIndex ] ), 
+				"record: " + RecordUtil.record2String( aRecord[ iRecord ] ), 
 				Util.unwrap( e ) 
 			);  			
 		}

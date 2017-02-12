@@ -30,8 +30,8 @@ import com.gwtext.client.widgets.event.PanelListenerAdapter;
 */
 @SuppressWarnings( "unchecked" )
 public class TabsPanel extends TabPanel implements ViewAccess {
-	private Access _access;
-	private String _sTag;
+	private Access access;
+	private String sTag;
 
 	public TabsPanel( ) {
 		addListener( 
@@ -54,7 +54,7 @@ public class TabsPanel extends TabPanel implements ViewAccess {
 	 */
 	@Override
 	public void setAccess( Access access ) {
-		_access = access;
+		this.access = access;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class TabsPanel extends TabPanel implements ViewAccess {
 	 */
 	@Override
 	public Access getAccess( ) {
-		return( _access );
+		return( access );
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class TabsPanel extends TabPanel implements ViewAccess {
 	 */
 	@Override
 	public String getTag( ) {
-		return( _sTag );
+		return( sTag );
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class TabsPanel extends TabPanel implements ViewAccess {
 	 */
 	@Override
 	public void setTag( String sTag ) {
-		_sTag = sTag;		
+		this.sTag = sTag;		
 		SetAccessEvent.fire( this );							
 	}
 }

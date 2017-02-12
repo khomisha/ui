@@ -133,6 +133,15 @@ public interface UIConstants extends com.google.gwt.i18n.client.Constants {
 	String report( );
 
 	/**
+	* Translated "Reports".
+	*
+	* @return translated "Reports"
+	*/
+	@DefaultStringValue( "Reports" )
+	@Key( "reports" )
+	String reports( );
+
+	/**
 	* Translated "OK".
 	*
 	* @return translated "OK"
@@ -151,12 +160,12 @@ public interface UIConstants extends com.google.gwt.i18n.client.Constants {
 	String cancel( );
 
 	/**
-	* Translated "New".
+	* Translated "Add".
 	*
-	* @return translated "New"
+	* @return translated "Add"
 	*/
-	@DefaultStringValue( "New" )
-	@Key( "new" )
+	@DefaultStringValue( "Add" )
+	@Key( "add" )
 	String add( );
 
 	/**
@@ -239,4 +248,22 @@ public interface UIConstants extends com.google.gwt.i18n.client.Constants {
 	@DefaultStringValue( "Password and it''s confirmation must agree." )
 	@Key( "invalidPassInput" )
 	String invalidPassInput( );	
+
+	/**
+	* Translated "Value".
+	*
+	* @return translated "Value"
+	*/
+	@DefaultStringValue( "Value" )
+	@Key( "value" )
+	String value( );
+
+	/**
+	* Translated "Name".
+	*
+	* @return translated "Name"
+	*/
+	@DefaultStringValue( "Name" )
+	@Key( "name" )
+	String name( );
 }

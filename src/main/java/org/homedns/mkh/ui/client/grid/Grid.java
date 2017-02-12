@@ -29,11 +29,14 @@ import org.homedns.mkh.dataservice.shared.Request;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Id;
 import org.homedns.mkh.ui.client.BaseMenu;
+import org.homedns.mkh.ui.client.HasButton;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.Pager;
 import org.homedns.mkh.ui.client.cache.PagerStore;
 import org.homedns.mkh.ui.client.cache.RecordUtil;
 import com.google.gwt.user.client.Command;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.grid.GridPanel;
 
 /**
@@ -41,11 +44,12 @@ import com.gwtext.client.widgets.grid.GridPanel;
  *
  */
 @SuppressWarnings( "unchecked" )
-public class Grid extends GridPanel implements Paging {	
-	private GridImpl _impl;
-	private Id _id;
-	private WidgetDesc _desc;
-	private Class< ? > _cacheType = PagerStore.class;
+public class Grid extends GridPanel implements Paging, HasButton {	
+	private GridImpl impl;
+	private Id id;
+	private WidgetDesc desc;
+	private Class< ? > cacheType = PagerStore.class;
+	private boolean bBatch = false;
 	
 	/**
 	 * @param id
@@ -55,8 +59,8 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	public Grid( Id id, GridImpl impl ) {
 		setID( id );
-		_impl = impl;
-		_impl.setGrid( this );
+		setImplementation( impl );
+		impl.setGrid( this );
 		RegisterViewEvent.fire( this );
 	}
 
@@ -65,7 +69,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void setID( Id id ) {
-		_id = id;
+		this.id = id;
 	}
 
 	/**
@@ -73,7 +77,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public Id getID( ) {
-		return( _id );
+		return( id );
 	}
 
 	/**
@@ -81,8 +85,8 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void init( ViewDesc desc ) {
-		_desc = ( WidgetDesc )desc;
-		_impl.init( );
+		this.desc = ( WidgetDesc )desc;
+		impl.init( );
 	}
 
 	/**
@@ -90,7 +94,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public ViewDesc getDescription( ) {
-		return( _desc );
+		return( desc );
 	}
 
 	/**
@@ -104,11 +108,11 @@ public class Grid extends GridPanel implements Paging {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.view.View#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.dataservice.client.view.View#onResponse(org.homedns.mkh.dataservice.shared.Response)
 	 */
 	@Override
-	public void refresh( Response data ) {
-		_impl.refresh( data );
+	public void onResponse( Response response ) {
+		impl.onResponse( response );
 	}
 
 	/**
@@ -116,7 +120,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public ViewCache getCache( ) {
-		return( _impl.getCache( ) );
+		return( impl.getCache( ) );
 	}
 
 	/**
@@ -125,7 +129,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public Request onInit( ) {
-		return( _impl.onInit( ) );
+		return( impl.onInit( ) );
 	}
 
 	/**
@@ -133,7 +137,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void setCache( ViewCache cache ) {
-		_impl.setCache( cache );
+		impl.setCache( cache );
 	}
 
 	/**
@@ -154,7 +158,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public int getPageSize( ) {
-		return( _desc.getDataBufferDesc( ).getTable( ).getPageSize( ) );
+		return( desc.getDataBufferDesc( ).getTable( ).getPageSize( ) );
 	}
 
 	/**
@@ -170,7 +174,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void onSend( Request request ) {
-		_impl.onSend( request );
+		impl.onSend( request );
 	}
 
 	/**
@@ -178,7 +182,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public Data getArgs( ) {
-		return( _impl.getArgs( ) );
+		return( impl.getArgs( ) );
 	}
 
 	/**
@@ -186,7 +190,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void setArgs( Data args ) {
-		_impl.setArgs( args );
+		impl.setArgs( args );
 	}
 
 	/**
@@ -202,7 +206,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public Class< ? > getCacheType( ) {
-		return( _cacheType );
+		return( cacheType );
 	}
 
 	/**
@@ -210,7 +214,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void setCacheType( Class< ? > cacheType ) {
-		_cacheType = cacheType;		
+		this.cacheType = cacheType;		
 	}
 
 	/**
@@ -218,7 +222,7 @@ public class Grid extends GridPanel implements Paging {
 	 */
 	@Override
 	public void setAfterInitCommand( Command cmd ) {
-		_impl.setAfterInitCommand( cmd );
+		impl.setAfterInitCommand( cmd );
 	}
 	
 	/**
@@ -227,6 +231,80 @@ public class Grid extends GridPanel implements Paging {
 	 * @return the context menu or null
 	 */
 	public BaseMenu getContextMenu( ) {
-		return( _impl.getContextMenu( ) );
+		return( impl.getContextMenu( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#refresh()
+	 */
+	@Override
+	public void refresh( ) {
+		impl.refresh( );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#getResponse()
+	 */
+	@Override
+	public Response getResponse( ) {
+		return( impl.getResponse( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setResponse(org.homedns.mkh.dataservice.shared.Response)
+	 */
+	@Override
+	public void setResponse( Response response ) {
+		impl.setResponse( response );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#reload()
+	 */
+	@Override
+	public void reload( ) {
+		impl.reload( );		
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setBatchUpdate(boolean)
+	 */
+	@Override
+	public void setBatchUpdate( boolean bBatch ) {
+		this.bBatch = bBatch;
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isBatchUpdate()
+	 */
+	@Override
+	public boolean isBatchUpdate( ) {
+		return( bBatch );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.HasButton#onButtonClick(com.gwtext.client.widgets.Button, com.gwtext.client.core.EventObject)
+	 */
+	@Override
+	public void onButtonClick( Button button, EventObject e ) {
+		impl.onButtonClick( button, e );
+	}
+
+	/**
+	 * Returns implementation object
+	 * 
+	 * @return the implementation object
+	 */
+	protected AbstractGridImpl getImplementation( ) {
+		return( impl );
+	}
+
+	/**
+	 * Sets implementation object
+	 * 
+	 * @param impl the implementation object to set
+	 */
+	protected void setImplementation( AbstractGridImpl impl ) {
+		this.impl = ( GridImpl )impl;
 	}
 }

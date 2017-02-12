@@ -26,7 +26,7 @@ import org.homedns.mkh.dataservice.shared.AttributeMap;
  *
  */
 @SuppressWarnings( "serial" )
-public class WidgetConfig extends AttributeMap< Integer, Object > {
+public class WidgetConfig extends AttributeMap< Integer, Object > implements Config {
 	/**
 	 * locale-sensitive text constants
 	 */
@@ -56,9 +56,23 @@ public class WidgetConfig extends AttributeMap< Integer, Object > {
 	* Initial arguments values
 	*/
 	public static final Integer BORDER = 6;
+	/**
+	* Initial arguments values
+	*/
+	public static final Integer AUTO_SCROLL = 7;
+	/**
+	* Widget batch update flag, default false
+	*/
+	public static final Integer BATCH_UPDATE = 8;
+	/**
+	* Widget custom css using flag, default false
+	*/
+	public static final Integer CUSTOM_CSS = 9;
 
 	public WidgetConfig( ) {
 		setAttribute( AUTO_WIDTH, true );
 		setAttribute( BORDER, true );
+		setAttribute( BATCH_UPDATE, false );
+		setAttribute( CUSTOM_CSS, false );
 	}
 }

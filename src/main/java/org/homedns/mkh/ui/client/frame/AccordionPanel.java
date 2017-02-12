@@ -18,54 +18,43 @@
 
 package org.homedns.mkh.ui.client.frame;
 
-import org.homedns.mkh.dataservice.client.event.SetAccessEvent;
-import org.homedns.mkh.dataservice.client.view.ViewAccess;
+import org.homedns.mkh.dataservice.client.view.View;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.grid.event.GridListenerAdapter;
 import com.gwtext.client.widgets.layout.AccordionLayout;
+import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
 * Container with accordion layout contains list panel and edit panel
 */
 @SuppressWarnings( "unchecked" )
-public class AccordionPanel extends Panel implements ViewAccess {
-	private String _sTag;	
-	private Panel _listPanel;
-	private Panel _editPanel;
-	private int _iCompletedCount = 0;
-	private Access _access;
+public class AccordionPanel extends GenericPanel {
+	private int iCompletedCount = 0;
 
-	/**
-	 * @param sTitle
-	 *            the panel title
-	 * @param sListTitle
-	 *            the list panel title
-	 * @param sEditPanelTitle
-	 *            the edit panel title
-	 */
-	public AccordionPanel( String sTitle, String sListTitle, String sEditPanelTitle ) {
-		super( sTitle );
+	public AccordionPanel( ) {
 		setLayout( new AccordionLayout( false ) );
-		_listPanel = new Panel( sListTitle );
-		_listPanel.setBorder( false );
-		_editPanel = new Panel( sEditPanelTitle );
-		_editPanel.setBorder( false );
+	}
+	
+	public AccordionPanel( String sTitle ) {
+		this( );
+		setTitle( sTitle );
 	}
 
 	/**
-	 * @return the list panel
+	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
-	public Panel getListPanel( ) {
-		return( _listPanel );
-	}
-
-	/**
-	 * @return the edit panel
-	 */
-	public Panel getEditPanel( ) {
-		return( _editPanel );
+	@Override
+	protected void init( ) {
+		Panel listPanel = new Panel( );
+		listPanel.setBorder( false );
+		listPanel.setLayout( new FitLayout( ) );
+		putPanel( "list", listPanel );
+		Panel editPanel = new Panel( );
+		editPanel.setBorder( false );	
+		editPanel.setLayout( new FitLayout( ) );
+		putPanel( "edit", editPanel );		
 	}
 
 	/**
@@ -81,21 +70,28 @@ public class AccordionPanel extends Panel implements ViewAccess {
 	 * Expands detail panel
 	 */
 	protected void expandDetail( ) {
-		_listPanel.collapse( );
-		_editPanel.expand( );
+		getPanel( "list" ).collapse( );
+		getPanel( "edit" ).expand( );
 	}
 	
 	/**
 	 * Adds list panel and edit panel then when they are completed 
 	 */
-	protected void addPanels( ) {
-		_iCompletedCount++;
-		if( _iCompletedCount == 2 ) {
-			add( _listPanel );
-			add( _editPanel );
+	public void addPanels( ) {
+		iCompletedCount++;
+		if( iCompletedCount == 2 ) {
+			add( getPanel( "list" ) );
+			add( getPanel( "edit" ) );
 			doLayout( );
+		}
 	}
-}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#onAfterInit(org.homedns.mkh.dataservice.client.view.View)
+	 */
+	@Override
+	protected void onAfterInit( View view ) {
+	}
 	
 	/**
 	 * Built in list panel grid listener adapter, performs expand detail action
@@ -108,38 +104,5 @@ public class AccordionPanel extends Panel implements ViewAccess {
 		public void onDblClick( EventObject e ) {
 			expandDetail( );
 		}		
-	}
-
-	/**
-	 * @see org.homedns.mkh.dataservice.client.view.ViewAccess#setAccess(org.homedns.mkh.dataservice.client.view.ViewAccess.Access)
-	 */
-	@Override
-	public void setAccess( Access access ) {
-		_access = access;
-	}
-
-	/**
-	 * @see org.homedns.mkh.dataservice.client.view.ViewAccess#getAccess()
-	 */
-	@Override
-	public Access getAccess( ) {
-		return( _access );
-	}
-
-	/**
-	 * @see org.homedns.mkh.dataservice.client.view.ViewAccess#getTag()
-	 */
-	@Override
-	public String getTag( ) {
-		return( _sTag );
-	}
-
-	/**
-	 * @see org.homedns.mkh.dataservice.client.view.ViewAccess#setTag(java.lang.String)
-	 */
-	@Override
-	public void setTag( String sTag ) {
-		_sTag = sTag;		
-		SetAccessEvent.fire( this );							
 	}
 }

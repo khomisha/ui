@@ -20,7 +20,9 @@ package org.homedns.mkh.ui.client.grid;
 
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Type;
+import org.homedns.mkh.ui.client.form.FieldFactory;
 import org.homedns.mkh.ui.client.form.ListBox;
+
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.widgets.form.Checkbox;
@@ -95,7 +97,7 @@ public class CellEditor {
 			_gridEditor = new GridEditor( new NumberField( ) );			
 		} else if( type == Type.TIMESTAMP ) {
 			DateField dt = new DateField( );
-			dt.setFormat( "Y-m-d H:i:s" );
+			dt.setFormat( FieldFactory.TIMESTAMP_FMT );
 			_gridEditor = new GridEditor( dt );
 		} else if( type == Type.BOOLEAN ) {
 			_gridEditor = new GridEditor( new Checkbox( ) );					

@@ -41,6 +41,7 @@ public class InsertCmd extends GenericCommand< View > {
 			InsertRequest.class 
 		);
 		request.setID( getParam( ).getID( ) );
+		request.setBatchUpdate( getParam( ).isBatchUpdate( ) );
 		getParam( ).getSavingData( request );
 		SendBinder.bind( request ).send( );
 	}

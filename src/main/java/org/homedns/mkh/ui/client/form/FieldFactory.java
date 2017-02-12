@@ -20,6 +20,7 @@ package org.homedns.mkh.ui.client.form;
 
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Type;
+
 import com.gwtext.client.widgets.form.Checkbox;
 import com.gwtext.client.widgets.form.DateField;
 import com.gwtext.client.widgets.form.Field;
@@ -34,6 +35,9 @@ import com.gwtext.client.widgets.form.TimeField;
  *
  */
 public class FieldFactory {
+	public static final String TIMESTAMP_FMT = "Y-m-d H:i:s";
+	public static final String TIME_FMT = "g:i:s A";
+	public static final String DATE_FMT = "Y-m-d";
 	private static final int FIELD_WIDTH = 120;
 	
 	/**
@@ -70,7 +74,7 @@ public class FieldFactory {
 			newField = field;
 		} else if( Column.EDIT_TS.equals( sStyle ) ) {
 			DateField field = new DateField( sCaption, sColName, FIELD_WIDTH );
-			field.setFormat( "Y-m-d H:i:s" );
+			field.setFormat( TIMESTAMP_FMT );
 			newField = field;
 		} else if( "".equals( sStyle ) ) {
 			// no style - no field
@@ -106,6 +110,7 @@ public class FieldFactory {
 				textField.setAllowBlank( !col.isRequired( ) );
 				textField.setSelectOnFocus( true );
 			}
+			newField.setValidateOnBlur( false );
 			newField.setValidationEvent( false );
 		}
 		return( newField );

@@ -41,6 +41,7 @@ public class DeleteCmd extends GenericCommand< View > {
 			DeleteRequest.class 
 		);
 		request.setID( getParam( ).getID( ) );
+		request.setBatchUpdate( getParam( ).isBatchUpdate( ) );
 		getParam( ).getSavingData( request );
 		SendBinder.bind( request ).send( );
 	}

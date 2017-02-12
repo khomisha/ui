@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Mikhail Khodonov
+ * Copyright 2016 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,25 +16,26 @@
  * $Id$
  */
 
-package org.homedns.mkh.ui.client.command;
+package org.homedns.mkh.ui.client;
 
-import com.google.gwt.user.client.ui.DialogBox;
+import org.homedns.mkh.dataservice.client.view.View;
+import com.gwtext.client.data.Record;
 
 /**
- * Change password command
+ * Child view interface
  *
  */
-public class ChangePassCmd extends GenericCommand< DialogBox > {
-	
-	public ChangePassCmd( ) {
-	}
+public interface ChildView extends View {
+
+	/**
+	 * Performs child view action on select row in master view 
+	 */
+	public void onSelectRowAction( );
 	
 	/**
-	 * @see org.homedns.mkh.ui.client.command.GenericCommand#execute()
+	 * Returns current parent record
+	 * 
+	 * @return the parent record
 	 */
-	@Override
-	public void execute( ) {
-		getParam( ).center( );
-		getParam( ).show( );
-	}
+	public Record getParentRec( );
 }

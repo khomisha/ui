@@ -33,8 +33,8 @@ public class BaseCommandCreator implements CommandCreator {
 	@Override
 	public Command instantiate( Class< ? > type ) {
 		Command cmd = null;
-		if( type == ChangePassCmd.class ) {
-			cmd = new ChangePassCmd( );
+		if( type == ShowDialogCmd.class ) {
+			cmd = new ShowDialogCmd( );
 		} else if( type == DeleteCmd.class ) {
 			cmd = new DeleteCmd( );
 		} else if( type == ExitCmd.class ) {
@@ -55,6 +55,12 @@ public class BaseCommandCreator implements CommandCreator {
 			cmd = new RetrieveCmd( );
 		} else if( type == UpdateCmd.class ) {
 			cmd = new UpdateCmd( );
+		} else if( type == HideDialogCmd.class ) {
+			cmd = new HideDialogCmd( );		
+		} else if( type == StoredProcCallCmd.class ) {
+			cmd = new StoredProcCallCmd( );		
+		} else if( type == RefreshCmd.class ) {
+			cmd = new RefreshCmd( );
 		}
 		return( cmd );
 	}

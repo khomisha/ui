@@ -80,22 +80,22 @@ public interface UIMessages extends com.google.gwt.i18n.client.Messages {
 	String invalidLogin( );
 	
 	/**
-	* Translated "Displaying {0} - {1}".
+	* Translated "Displaying".
 	*
-	* @return translated "Displaying {0} - {1}"
+	* @return translated "Displaying"
 	*/
-	@DefaultMessage( "Displaying {0} - {1}" )
+	@DefaultMessage( "Displaying" )
 	@Key( "displaying" )
-	String displaying( int iStart, int iEnd );
+	String displaying( );
 	
 	/**
-	* Translated "of {0}".
+	* Translated "of".
 	*
-	* @return translated "of {0}"
+	* @return translated "of"
 	*/
-	@DefaultMessage( "of {0}" )
+	@DefaultMessage( "of" )
 	@Key( "of" )
-	String of( int iTotal );
+	String of( );
 
 	/**
 	* Translated "Page".

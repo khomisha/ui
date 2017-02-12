@@ -37,7 +37,7 @@ public class CheckboxRenderer implements Renderer {
 	public String render( 
 		Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store 
 	) {
-		final boolean bChecked = ( "1".equals( String.valueOf( value ) ) );
+		final boolean bChecked = ( (Boolean)value ).booleanValue( );
 		return(
 			"<img class=\"checkbox\" src=\"" + 
 			GWT.getModuleBaseURL( ) + "/js/ext/resources/images/default/menu/" +

@@ -20,8 +20,10 @@ package org.homedns.mkh.ui.client.form;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.homedns.mkh.ui.client.CSSHelper;
 import org.homedns.mkh.ui.client.CmdTypeItem;
 import org.homedns.mkh.ui.client.command.CommandFactory;
+import org.homedns.mkh.ui.client.grid.GridConfig;
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Position;
@@ -39,23 +41,26 @@ import com.gwtext.client.widgets.layout.AnchorLayoutData;
  *
  */
 public class BaseForm extends FormPanel {
-	private FormConfig _cfg;
-	private Map< String, FormButton > _buttons = new HashMap< String, FormButton >( );
-	private Command _cmd;
+	private FormConfig cfg;
+	private Map< String, FormButton > buttons = new HashMap< String, FormButton >( );
+	private Command cmd;
+	
+	public BaseForm( ) {
+	}
 
 	/**
 	 * @param cfg
 	 *            the form configuration object
 	 */
 	public BaseForm( FormConfig cfg ) {
-		_cfg = cfg;
+		this.cfg = cfg;
 	}
 
 	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#setAfterInitCommand(Command)
 	 */
 	public void setAfterInitCommand( Command cmd ) {
-		_cmd = cmd;
+		this.cmd = cmd;
 	}
 	
 	/**
@@ -64,7 +69,7 @@ public class BaseForm extends FormPanel {
 	 * @return the command
 	 */
 	protected Command getAfterInitCommand( ) {
-		return( _cmd );
+		return( cmd );
 	}
 	
 	/**
@@ -85,7 +90,7 @@ public class BaseForm extends FormPanel {
 					}
 				}
 			);		
-			_buttons.put( btn.getText( ), btn );
+			buttons.put( btn.getText( ), btn );
 			addButton( btn );
 		}
 	}
@@ -96,16 +101,25 @@ public class BaseForm extends FormPanel {
 	 * @return the form configuration object
 	 */
 	public FormConfig getFormConfig( ) {
-		return( _cfg );
+		return( cfg );
 	}
 	
+	/**
+	 * Sets form configuration object
+	 * 
+	 * @param cfg the form configuration object to set
+	 */
+	public void setFormConfig( FormConfig cfg ) {
+		this.cfg = cfg;
+	}
+
 	/**
 	 * Returns buttons map
 	 * 
 	 * @return the buttons map
 	 */
 	public Map< String, FormButton > getButtons( ) {
-		return( _buttons );
+		return( buttons );
 	}
 
 	/**
@@ -117,7 +131,10 @@ public class BaseForm extends FormPanel {
 	 *            the visible flag
 	 */
 	public void setVisibleButton( String sName, boolean bVisible ) {
-		getButtons( ).get( sName ).setVisible( bVisible );
+		FormButton btn = getButtons( ).get( sName );
+		if( btn != null ) {
+			btn.setVisible( bVisible );
+		}
 	}
 	
 	/**
@@ -129,7 +146,10 @@ public class BaseForm extends FormPanel {
 	 *            the disable flag
 	 */
 	public void setDisabledButton( String sName, boolean bDisabled ) {
-		getButtons( ).get( sName ).setDisabled( bDisabled );
+		FormButton btn = getButtons( ).get( sName );
+		if( btn != null ) {
+			btn.setDisabled( bDisabled );
+		}
 	}
 	
 	/**
@@ -141,7 +161,10 @@ public class BaseForm extends FormPanel {
 	 *            the visible flag
 	 */
 	public void setVisibleField( String sName, boolean bVisible ) {
-		getForm( ).findField( sName ).setVisible( bVisible );
+		Field field = getForm( ).findField( sName );
+		if( field != null ) { 
+			field.setVisible( bVisible );
+		}
 	}
 	
 	/**
@@ -153,7 +176,10 @@ public class BaseForm extends FormPanel {
 	 *            the disable flag
 	 */
 	public void setDisabledField( String sName, boolean bDisabled ) {
-		getForm( ).findField( sName ).setDisabled( bDisabled );
+		Field field = getForm( ).findField( sName );
+		if( field != null ) { 
+			field.setDisabled( bDisabled );
+		}
 	}
 
 	/**
@@ -214,21 +240,25 @@ public class BaseForm extends FormPanel {
 	 * Configures form
 	 */
 	protected void config( ) {
-		String sTitle = ( String )_cfg.getAttribute( FormConfig.TITLE );
+		String sTitle = ( String )cfg.getAttribute( FormConfig.TITLE );
 		if( !"".equals( sTitle ) ) {
 			setTitle( sTitle );
 		}	
-		if( ( Boolean )_cfg.getAttribute( FormConfig.AUTO_WIDTH ) ) {
+		if( ( Boolean )cfg.getAttribute( FormConfig.AUTO_WIDTH ) ) {
 			setAutoWidth( true );
 		} else {
-			setWidth( ( Integer )_cfg.getAttribute( FormConfig.WIDTH ) );
+			setWidth( ( Integer )cfg.getAttribute( FormConfig.WIDTH ) );
 		}
-		setBorder( ( Boolean )_cfg.getAttribute( FormConfig.BORDER ) );
-		setLabelWidth( ( Integer )_cfg.getAttribute( FormConfig.LABEL_WIDTH ) );
-		setLabelAlign( ( Position )_cfg.getAttribute( FormConfig.LABEL_ALIGN ) );
-		setPaddings( ( Integer )_cfg.getAttribute( FormConfig.PADDING ) );
-		setButtonAlign( ( Position )_cfg.getAttribute( FormConfig.BUTTON_ALIGN ) );
-		setTrackResetOnLoad( ( Boolean )_cfg.getAttribute( FormConfig.TRACK_ON_RESET ) );
+		setBorder( ( Boolean )cfg.getAttribute( FormConfig.BORDER ) );
+		setLabelWidth( ( Integer )cfg.getAttribute( FormConfig.LABEL_WIDTH ) );
+		setLabelAlign( ( Position )cfg.getAttribute( FormConfig.LABEL_ALIGN ) );
+		setPaddings( ( Integer )cfg.getAttribute( FormConfig.PADDING ) );
+		setButtonAlign( ( Position )cfg.getAttribute( FormConfig.BUTTON_ALIGN ) );
+		setTrackResetOnLoad( ( Boolean )cfg.getAttribute( FormConfig.TRACK_ON_RESET ) );
+		setAutoScroll( ( Boolean )cfg.getAttribute( FormConfig.AUTO_SCROLL ) );		
+		if( ( Boolean )cfg.getAttribute( GridConfig.CUSTOM_CSS ) ) {
+			CSSHelper.getCSSInjector( ).injectCSS( this );
+		}
 	}
 
 	/**
@@ -255,5 +285,22 @@ public class BaseForm extends FormPanel {
 		} else {
 			add( field, new AnchorLayoutData( "95%" ) );
 		}					
+	}
+	
+	/**
+	 * Returns true if all fields are passed validation and false otherwise
+	 * 
+	 * @return true if pass validation, false otherwise
+	 */
+	protected boolean validate( ) {
+		try {
+			for( Field field : getFields( ) ) {
+				field.validate( );
+			}
+			return( true );
+		}
+		catch( Exception e ) {
+			return( false );
+		}
 	}
 }

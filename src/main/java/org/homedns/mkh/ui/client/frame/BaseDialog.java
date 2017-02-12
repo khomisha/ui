@@ -18,8 +18,8 @@
 
 package org.homedns.mkh.ui.client.frame;
 
+import org.homedns.mkh.ui.client.CSSHelper;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.Panel;
@@ -49,7 +49,7 @@ public class BaseDialog extends DialogBox {
 		this( );
 		setText( sTitle );
 		_panel = panel;
-		_panel.addListener( 
+		panel.addListener( 
 			new ComponentListenerAdapter( ) {
 				@Override
 				public void onHide( Component component ) {
@@ -88,30 +88,9 @@ public class BaseDialog extends DialogBox {
 		addStyleName( "x-panel-tc" );
 		addStyleName( "x-panel-bc" );
 		addStyleName( "x-panel-mc" );
-		Element child = getChild( "Caption" );
+		Element child = CSSHelper.getChild( this, "Caption" );
 		if( child != null ) {
 			setStyleName( child , "x-panel-header" );
 		}
-	}
-
-	/**
-	 * Returns first matching child element with given css class name
-	 * 
-	 * @param panel
-	 *            sCssClass css class name to match
-	 * 
-	 * @return child element or null
-	 */
-	private Element getChild( String sCssClass ) {
-		Element child = null;
-		NodeList< Element > list = getElement( ).getElementsByTagName( "*" );
-		for( int iNode = 0; iNode < list.getLength( ); iNode++ ) {
-			Element e = list.getItem( iNode );
-			if( ( e.getClassName( ) ).contains( sCssClass ) ) {
-				child = e;
-				break;
-			}
-		}		
-		return( child );
 	}
 }

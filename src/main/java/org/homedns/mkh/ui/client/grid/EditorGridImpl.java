@@ -20,41 +20,51 @@ package org.homedns.mkh.ui.client.grid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.shared.CUDRequest;
 import org.homedns.mkh.dataservice.shared.DeleteRequest;
 import org.homedns.mkh.dataservice.shared.InsertRequest;
 import org.homedns.mkh.dataservice.shared.Request;
-import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.UpdateRequest;
 import org.homedns.mkh.ui.client.cache.RecordUtil;
+import org.homedns.mkh.ui.client.cache.WidgetStore;
 import org.homedns.mkh.ui.client.event.SelectRowEvent;
+
+import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.Record.Operation;
 import com.gwtext.client.data.event.StoreListenerAdapter;
 import com.gwtext.client.widgets.form.Field;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
-import com.gwtext.client.widgets.grid.CellSelectionModel;
 import com.gwtext.client.widgets.grid.EditorGridPanel;
 import com.gwtext.client.widgets.grid.GridEditor;
-import com.gwtext.client.widgets.grid.event.CellSelectionModelListenerAdapter;
+import com.gwtext.client.widgets.grid.GridPanel;
+import com.gwtext.client.widgets.grid.event.EditorGridListenerAdapter;
+import com.gwtext.client.widgets.grid.event.GridCellListenerAdapter;
+import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 
 /**
  * Implements editor grid functionality
  *
  */
-public class EditorGridImpl extends GridImpl {
-	private ArrayList< Record > _removedRecords;
-	private ArrayList< Record > _addedRecords;
-	private ArrayList< Record > _updatedRecords;
+public class EditorGridImpl extends GridImpl {	
+	private List< Record > removedRecords;
+	private List< Record > addedRecords;
+	private List< Record > updatedRecords;
+	private List< String > readonlyCols;
 
 	/**
 	 * @param cfg
 	 *            the grid configuration object
 	 */
-	public EditorGridImpl( GridConfig cfg ) {
+	public EditorGridImpl( EditorGridConfig cfg ) {
 		super( cfg );
+		this.removedRecords = new ArrayList< Record >( );
+		this.addedRecords = new ArrayList< Record >( );
+		this.updatedRecords = new ArrayList< Record >( );
 	}
 
 	/**
@@ -65,18 +75,89 @@ public class EditorGridImpl extends GridImpl {
 		super.config( );
 		final EditorGridPanel grid = ( EditorGridPanel )getGrid( );
 		grid.setClicksToEdit( 1 );
-		grid.getCellSelectionModel( ).addListener( 
-			new CellSelectionModelListenerAdapter( ) {
+		EditorGridConfig cfg = ( EditorGridConfig )getConfiguration( );
+		readonlyCols = Arrays.asList( ( String[] )cfg.getAttribute( EditorGridConfig.READONLY_COLS ) );
+		grid.addEditorGridListener( 
+			new EditorGridListenerAdapter( ) {
 				@Override
-				public void onSelectionChange( 
-					CellSelectionModel sm,
-					Record record, 
-					int[] rowIndexColIndex 
+				public boolean doBeforeEdit( 
+					GridPanel grid, 
+					Record record,
+					String field, 
+					Object value, 
+					int rowIndex, 
+					int colIndex 
 				) {
-					SelectRowEvent.fire( ( ( View )grid ).getID( ), record );
+					return( !readonlyCols.contains( field ) );
 				}
+				
 			}
 		);
+        grid.addGridCellListener(
+        	new GridCellListenerAdapter() {
+        		public void onCellClick( GridPanel grid, int rowIndex, int colIndex, EventObject e ) {
+        			if( e.getTarget( ".checkbox", 1 ) != null ) {
+        				Record record = grid.getStore( ).getAt( rowIndex );
+        				String sDataIndex = grid.getColumnModel( ).getDataIndex( colIndex );
+        				record.set( sDataIndex, !record.getAsBoolean( sDataIndex ) );
+        			}
+        		}
+        	}
+        );
+        grid.addGridRowListener( 
+        	new GridRowListenerAdapter( ) {
+				@Override
+				public void onRowClick( GridPanel grid, int rowIndex, EventObject e ) {
+					setSelectedRow( rowIndex );
+					SelectRowEvent.fire( 
+						( ( View )grid ).getID( ), 
+						grid.getStore( ).getAt( rowIndex ) 
+					);
+				}
+        	}
+        );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#getRemovedRecords()
+	 */
+	protected List< Record > getRemovedRecords( ) {
+		return removedRecords;
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#getAddedRecords()
+	 */
+	protected List< Record > getAddedRecords( ) {
+		return addedRecords;
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#getUpdatedRecords()
+	 */
+	protected List< Record > getUpdatedRecords( ) {
+		return updatedRecords;
+	}
+	
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setRemovedRecords(java.util.List)
+	 */
+	public void setRemovedRecords( List< Record > removedRecords ) {
+		this.removedRecords = removedRecords;
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setAddedRecords(java.util.List)
+	 */
+	public void setAddedRecords( List< Record > addedRecords ) {
+		this.addedRecords = addedRecords;
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setUpdatedRecords(java.util.List)
+	 */
+	public void setUpdatedRecords( List< Record > updatedRecords ) {
+		this.updatedRecords = updatedRecords;
 	}
 
 	/**
@@ -84,6 +165,10 @@ public class EditorGridImpl extends GridImpl {
 	 */
 	@Override
 	protected void selectRow( int iRow ) {
+		WidgetStore store = ( WidgetStore )getCache( );
+		if( store.getRowCount( ) < 1 ) {
+			return;
+		}
 		( ( EditorGrid )getGrid( ) ).getCellSelectionModel( ).select( iRow, 1 );
 	}
 
@@ -97,7 +182,9 @@ public class EditorGridImpl extends GridImpl {
 				ColConfig cc = ( ColConfig )colConfig;
 				if( !cc.getHidden( ) ) {
 					Field field = cc.getField( );
-					cc.setEditor( new GridEditor( field ) );
+					if( !"checkbox".equals( field.getXType( ) ) ) {
+						cc.setEditor( new GridEditor( field ) );
+					}
 				}
 			}
 		}
@@ -115,15 +202,15 @@ public class EditorGridImpl extends GridImpl {
 			new StoreListenerAdapter( ) {
 				@Override
 				public void onAdd( Store store, Record[] records, int index ) {
-					_addedRecords.addAll( Arrays.asList( records ) );
+					addedRecords.addAll( Arrays.asList( records ) );
 				}
 
 				@Override
 				public void onRemove( Store store, Record record, int index ) {
-					if( _addedRecords.contains( record ) ) {
-						_addedRecords.remove( record );
+					if( addedRecords.contains( record ) ) {
+						addedRecords.remove( record );
 					} else {
-						_removedRecords.add( record );
+						removedRecords.add( record );
 					}
 				}
 
@@ -132,10 +219,10 @@ public class EditorGridImpl extends GridImpl {
 					Store store, Record record, Operation operation 
 				) {
 					if( 
-						!_addedRecords.contains( record ) && 
-						!_updatedRecords.contains( record ) 
+						!addedRecords.contains( record ) && 
+						!updatedRecords.contains( record ) 
 					) {
-						_updatedRecords.add( record );
+						updatedRecords.add( record );
 					}					
 				}
 			}
@@ -143,28 +230,52 @@ public class EditorGridImpl extends GridImpl {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getSavingData()
+	 * Returns true if grid content has been changed and false otherwise
+	 * 
+	 * @return true or false
+	 */
+	public boolean isDirty( ) {
+		return( !( updatedRecords.isEmpty( ) && removedRecords.isEmpty( ) && addedRecords.isEmpty( ) ) );
+	}
+	
+	/**
+	 * @see org.homedns.mkh.dataservice.client.Response#getSavingData(org.homedns.mkh.dataservice.shared.Request)
 	 */
 	protected void getSavingData( Request request ) {
 		String s = null;
 		if( request instanceof InsertRequest ) {
-			s = RecordUtil.getJsonData( _addedRecords );
+			s = RecordUtil.getJsonData( addedRecords );
 		} else if( request instanceof DeleteRequest ) {
-			s = RecordUtil.getJsonData( _removedRecords );			
+			s = RecordUtil.getJsonData( removedRecords );			
 		} else if( request instanceof UpdateRequest ) {
-			s = RecordUtil.getJsonData( _updatedRecords );
+			s = RecordUtil.getJsonData( updatedRecords );
 		}
 		( ( CUDRequest )request ).setData( s );		
 	}
 
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#refresh()
 	 */
 	@Override
-	protected void refresh( Response data ) {
-		super.refresh( data );
-		_addedRecords.clear( );
-		_removedRecords.clear( );
-		_updatedRecords.clear( );
+	protected void refresh( ) {
+		super.refresh( );
+		this.addedRecords.clear( );
+		this.removedRecords.clear( );
+		this.updatedRecords.clear( );
+	}
+	
+	/**
+	 * {@link org.homedns.mkh.ui.client.grid.EditorGrid}
+	 */
+	protected void removeFromRecords( int iType, Record record ) {
+		if( iType == EditorGrid.ADDED ) {
+			addedRecords.remove( record );
+		}
+		if( iType == EditorGrid.UPDATED ) {
+			updatedRecords.remove( record );			
+		}
+		if( iType == EditorGrid.REMOVED ) {
+			removedRecords.remove( record );			
+		}
 	}
 }

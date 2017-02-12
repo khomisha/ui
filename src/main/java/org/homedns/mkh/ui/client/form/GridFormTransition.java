@@ -34,17 +34,17 @@ public class GridFormTransition extends Transition {
 		TransitionCommand roCmd = new Transition2ReadOnlyCommand( );
 		TransitionCommand addCmd = new Transition2AddCommand( );
 		TransitionCommand updateCmd = new Transition2UpdateCommand( );
+		TransitionCommand nostateCmd = new Transition2NoStateCommand( );
 		TransitionCommand[][] transitionTable = new TransitionCommand[][] {
 			{ noCmd, roCmd, addCmd, updateCmd },
-			{ noCmd, noCmd, addCmd, updateCmd },
-			{ noCmd, roCmd, noCmd, wrongCmd },
-			{ noCmd, roCmd, wrongCmd, noCmd }
+			{ nostateCmd, noCmd, addCmd, updateCmd },
+			{ nostateCmd, roCmd, noCmd, wrongCmd },
+			{ nostateCmd, roCmd, wrongCmd, noCmd }
 		};
 		setTransitionTable( transitionTable );
 	}
 	
 	protected class Transition2AddCommand implements TransitionCommand {
-
 		/**
 		 * @see org.homedns.mkh.ui.client.TransitionCommand#execute(org.homedns.mkh.ui.client.HasState)
 		 */
@@ -55,6 +55,7 @@ public class GridFormTransition extends Transition {
 				form.setVisibleButton( CONSTANTS.save( ), true );
 				form.setVisibleButton( CONSTANTS.update( ), false );
 				form.setVisibleButton( CONSTANTS.add( ), false );
+				form.setVisibleButton( CONSTANTS.del( ), false );
 				form.setVisibleButton( CONSTANTS.cancel( ), true );
 				form.setDisabledFields( false );
 				form.getForm( ).reset( );
@@ -64,7 +65,6 @@ public class GridFormTransition extends Transition {
 	}
 
 	protected class Transition2UpdateCommand implements TransitionCommand {
-
 		/**
 		 * @see org.homedns.mkh.ui.client.TransitionCommand#execute(org.homedns.mkh.ui.client.HasState)
 		 */
@@ -75,6 +75,7 @@ public class GridFormTransition extends Transition {
 				form.setVisibleButton( CONSTANTS.save( ), true );
 				form.setVisibleButton( CONSTANTS.update( ), false );
 				form.setVisibleButton( CONSTANTS.add( ), false );
+				form.setVisibleButton( CONSTANTS.del( ), false );
 				form.setVisibleButton( CONSTANTS.cancel( ), true );
 				form.setDisabledFields( false );
 				form.getFields( )[ 0 ].focus( );
@@ -83,7 +84,6 @@ public class GridFormTransition extends Transition {
 	}
 
 	protected class Transition2ReadOnlyCommand implements TransitionCommand {
-
 		/**
 		 * @see org.homedns.mkh.ui.client.TransitionCommand#execute(org.homedns.mkh.ui.client.HasState)
 		 */
@@ -94,9 +94,28 @@ public class GridFormTransition extends Transition {
 				form.setVisibleButton( CONSTANTS.save( ), false );
 				form.setVisibleButton( CONSTANTS.update( ), true );
 				form.setVisibleButton( CONSTANTS.add( ), true );
+				form.setVisibleButton( CONSTANTS.del( ), true );
 				form.setVisibleButton( CONSTANTS.cancel( ), false );
 				form.setDisabledFields( true );
 				form.refresh( );
+			}
+		}
+	}
+
+	protected class Transition2NoStateCommand implements TransitionCommand {
+		/**
+		 * @see org.homedns.mkh.ui.client.TransitionCommand#execute(org.homedns.mkh.ui.client.HasState)
+		 */
+		@Override
+		public void execute( HasState context ) {
+			if( context instanceof GridForm ) {
+				GridForm form = ( GridForm )context;
+				form.setVisibleButton( CONSTANTS.save( ), false );
+				form.setVisibleButton( CONSTANTS.update( ), false );
+				form.setVisibleButton( CONSTANTS.add( ), true );
+				form.setVisibleButton( CONSTANTS.del( ), false );
+				form.setVisibleButton( CONSTANTS.cancel( ), false );
+				form.setDisabledFields( true );
 			}
 		}
 	}

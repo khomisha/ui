@@ -46,8 +46,23 @@ public class GridConfig extends WidgetConfig {
 	* Context menu command type item list {@link org.homedns.mkh.ui.client.CmdTypeItem}
 	*/
 	public static final Integer CONTEXT_MENU = 34;
+	/**
+	* Sort condition
+	*/
+	public static final Integer SORT = 35;
+	/**
+	* Grid title
+	*/
+	public static final Integer TITLE = 36;
+	/**
+	* Stripe rows flag, default true
+	*/
+	public static final Integer STRIPE_ROWS = 37;
+	/**
+	* No toolbar flag doesn't sense if paging switch on, default false
+	*/
+	public static final Integer NO_TOOLBAR = 38;
 	
-
 	public GridConfig( ) {
 		super( );
 		setAttribute( WIDTH, 800 );
@@ -55,8 +70,13 @@ public class GridConfig extends WidgetConfig {
 		setAttribute( AUTO_HEIGHT, false );
 		setAttribute( COL_RESIZE, true );
 		setAttribute( FILTER, true );
-		setAttribute( REMOTE_FILTER, true );
+		setAttribute( REMOTE_FILTER, false );
 		setAttribute( COL_AUTO_EXPAND, true );
 		setAttribute( CONTEXT_MENU, null );
+		setAttribute( SORT, null );
+		setAttribute( TITLE, null );
+		setAttribute( STRIPE_ROWS, true );
+		setAttribute( AUTO_SCROLL, true );
+		setAttribute( NO_TOOLBAR, false );
 	}
 }

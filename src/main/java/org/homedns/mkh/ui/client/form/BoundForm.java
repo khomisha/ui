@@ -20,6 +20,9 @@ package org.homedns.mkh.ui.client.form;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.event.RegisterViewEvent;
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.client.view.ViewCache;
@@ -34,11 +37,20 @@ import org.homedns.mkh.dataservice.shared.RetrieveRequest;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.RecordUtil;
 import org.homedns.mkh.ui.client.cache.WidgetStore;
+import org.homedns.mkh.ui.client.command.CommandFactory;
+import org.homedns.mkh.ui.client.command.RetrieveCmd;
+import org.homedns.mkh.ui.client.grid.GridConfig;
+
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
+import com.gwtext.client.data.event.StoreListener;
 import com.gwtext.client.data.event.StoreListenerAdapter;
+import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.form.Field;
+import com.gwtext.client.widgets.layout.AnchorLayoutData;
+import com.gwtext.client.widgets.layout.FormLayout;
+
 import org.homedns.mkh.ui.client.CmdTypeItem;
 
 /**
@@ -46,12 +58,17 @@ import org.homedns.mkh.ui.client.CmdTypeItem;
 */
 @SuppressWarnings( "unchecked" )
 public class BoundForm extends BaseForm implements View {
-	private WidgetStore _store;
-	private Id _id;
-	private WidgetDesc _desc;
-	private Record _currentRecord;
-	private Data _args;
-	private Class< ? > _cacheType = WidgetStore.class;
+	private static final Logger LOG = Logger.getLogger( BoundForm.class.getName( ) );  
+
+	private WidgetStore store;
+	private Id id;
+	private WidgetDesc desc;
+	private Record currentRecord;
+	private Data args;
+	private Class< ? > cacheType = WidgetStore.class;
+	private Response response;
+	private boolean bBatch = false;
+	private StoreListener storeListener;
 
 	/**
 	 * @param id
@@ -62,6 +79,7 @@ public class BoundForm extends BaseForm implements View {
 	public BoundForm( Id id, FormConfig cfg ) {
 		super( cfg );
 		setID( id );
+		setStoreListener( new CacheListener( ) );
 		RegisterViewEvent.fire( this );
 	}
 
@@ -74,6 +92,7 @@ public class BoundForm extends BaseForm implements View {
 		FormConfig cfg = getFormConfig( );
 		addFields( ( String[] )cfg.getAttribute( FormConfig.FIELD_LIST ) );
 		addButtons( ( CmdTypeItem[] )cfg.getAttribute( FormConfig.BUTTONS ) );
+		setBatchUpdate( ( Boolean )cfg.getAttribute( GridConfig.BATCH_UPDATE ) );		
 	}
 
 	/**
@@ -83,13 +102,13 @@ public class BoundForm extends BaseForm implements View {
 	 *            the fields names array to add
 	 */
 	public void addFields( String[] asField ) {
-		Field[] fields = _desc.getFields( );
+		Field[] fields = desc.getFields( );
 		if( asField == null || asField.length == 0 ) { 
 			for( Field field : fields ) {
 				addField( field );
 			}
 		} else {
-			List< String > fieldNames = Arrays.asList( _store.getFields( ) );
+			List< String > fieldNames = Arrays.asList( store.getFields( ) );
 			for( String sField : asField ) {
 				int iField = fieldNames.indexOf( sField );
 				if( iField > -1 ) {
@@ -104,7 +123,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public ViewCache getCache( ) {
-		return( _store );
+		return( store );
 	}
 
 	/**
@@ -112,7 +131,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public ViewDesc getDescription( ) {
-		return( _desc );
+		return( desc );
 	}
 
 	/**
@@ -122,7 +141,7 @@ public class BoundForm extends BaseForm implements View {
 	 *            the view description to set
 	 */
 	public void setDescription( ViewDesc desc ) {
-		_desc = ( WidgetDesc )desc;
+		this.desc = ( WidgetDesc )desc;
 	}
 	
 	/**
@@ -130,7 +149,54 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public Id getID( ) {
-		return( _id );
+		return( id );
+	}
+	
+	/**
+	 * Returns field by it's name
+	 * 
+	 * @param sName
+	 *            the field (column) name
+	 * 
+	 * @return the field
+	 */
+	public Field getField( String sName ) {
+		Column col = desc.getDataBufferDesc( ).getColumn( sName );
+		return( desc.getCol2Field( ).get( col ) );
+	}
+
+	/**
+	 * Fills panel with specified fields
+
+	 * @param sTitle the panel title
+	 * @param asField
+	 *            fields names array
+	 * 
+	 * @return the panel with fields
+	 */
+	public Panel fillPanel( String sTitle, String[] asField ) {
+		Panel panel = fillPanel( asField );
+		panel.setTitle( sTitle );
+		return( panel );
+	}
+
+	/**
+	 * Fills panel with specified fields
+	 * 
+	 * @param asField
+	 *            fields names array
+	 * 
+	 * @return the panel with fields
+	 */
+	public Panel fillPanel( String[] asField ) {
+		Panel panel = new Panel( );			
+		panel.setLayout( new FormLayout( ) );
+		panel.setBorder( false );
+		for( String sField : asField ) {
+			Field field = getField( sField );
+			panel.add( field, new AnchorLayoutData( "95%" ) );
+		}
+		return( panel );
 	}
 
 	/**
@@ -138,13 +204,43 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void getSavingData( Request request ) {
-		Record record = _currentRecord.copy( );
+		if( currentRecord == null ) {
+			currentRecord = createRecord( );
+		}
+		Record record = currentRecord.copy( );
 		// puts form data to this record
 		if( updateRecord( record ) ) {
 			( ( CUDRequest )request ).setData( 
 				RecordUtil.getJsonData( new Record[] { record } ) 
 			);
 		}
+	}
+	
+	/**
+	 * Returns current record
+	 * 
+	 * @return the current record
+	 */
+	public Record getCurrentRecord( ) {
+		return( currentRecord );
+	}
+
+	/**
+	 * Sets current record
+	 * 
+	 * @param the record to set
+	 */
+	protected void setCurrentRecord( Record record ) {
+		currentRecord = record;
+	}
+	
+	/**
+	 * Creates empty record
+	 * 
+	 * @return the created record
+	 */
+	public Record createRecord( ) {
+		return( store.createRecord( ) );
 	}
 
 	/**
@@ -154,16 +250,8 @@ public class BoundForm extends BaseForm implements View {
 	public void init( ViewDesc desc ) {
 		setDescription( desc );
 		config( );
-		setReader( _store.getReader( ) );
-		_store.addStoreListener(
-			new StoreListenerAdapter( ) {
-				public void onLoad( Store store, Record[] records ) {
-					if( records.length > 0 ) {
-						loadRecord( records[ 0 ] );
-					}
-				}
-			}
-		);
+		setReader( store.getReader( ) );
+		store.addStoreListener( getStoreListener( ) );
 		Command cmd = getAfterInitCommand( );
 		if( cmd != null ) {
 			cmd.execute( );
@@ -176,15 +264,15 @@ public class BoundForm extends BaseForm implements View {
 	* @param record to load
 	*/
 	public void loadRecord( Record record ) {
-		_currentRecord = record;
-		getForm( ).loadRecord( record );		
+		currentRecord = record;
+		getForm( ).loadRecord( record );
 	}
 
 	/**
 	 * Loads empty record to the form
 	 */
 	public void loadEmptyRecord( ) {
-		loadRecord( _store.createRecord( ) );
+		loadRecord( createRecord( ) );
 	}
 
 	/**
@@ -206,11 +294,16 @@ public class BoundForm extends BaseForm implements View {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.view.View#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.dataservice.client.view.View#onResponse(org.homedns.mkh.dataservice.shared.Response)
 	 */
 	@Override
-	public void refresh( Response data ) {
-		refresh( );
+	public void onResponse( Response response ) {
+		this.response = response;
+		if( response.getResult( ) != Response.FAILURE ) {
+			if( isRendered( ) ) {
+				refresh( );
+			}
+		}
 	}
 
 	/**
@@ -219,8 +312,9 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	public void refresh( ) {
 		getForm( ).reset( );
-		if( _currentRecord != null ) {
-			loadRecord( _currentRecord );
+		if( currentRecord != null ) {
+			LOG.config( RecordUtil.record2String( currentRecord ) );
+			loadRecord( currentRecord );
 		}
 		getFields( )[ 0 ].focus( );		
 	}
@@ -230,7 +324,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void setCache( ViewCache cache ) {
-		_store = ( WidgetStore )cache;		
+		store = ( WidgetStore )cache;		
 	}
 
 	/**
@@ -238,7 +332,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void setID( Id id ) {
-		_id = id;
+		this.id = id;
 	}
 
 	/**
@@ -261,7 +355,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public Data getArgs( ) {
-		return( _args );
+		return( args );
 	}
 
 	/**
@@ -269,7 +363,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void setArgs( Data args ) {
-		_args = args;
+		this.args = args;
 	}
 
 	/**
@@ -277,7 +371,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public Class< ? > getCacheType( ) {
-		return( _cacheType );
+		return( cacheType );
 	}
 
 	/**
@@ -285,6 +379,87 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void setCacheType( Class< ? > cacheType ) {
-		_cacheType = cacheType;		
+		this.cacheType = cacheType;		
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#getResponse()
+	 */
+	@Override
+	public Response getResponse( ) {
+		return( response );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setResponse(org.homedns.mkh.dataservice.shared.Response)
+	 */
+	@Override
+	public void setResponse( Response response ) {
+		this.response = response;
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#reload()
+	 */
+	@Override
+	public void reload( ) {
+		Command cmd = CommandFactory.create( RetrieveCmd.class, this );
+		cmd.execute( );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setBatchUpdate(boolean)
+	 */
+	@Override
+	public void setBatchUpdate( boolean bBatch ) {
+		this.bBatch = bBatch;
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isBatchUpdate()
+	 */
+	@Override
+	public boolean isBatchUpdate( ) {
+		return( bBatch );
+	}
+
+	/**
+	 * Returns store listener object 
+	 * 
+	 * @return the store listener object
+	 */
+	public StoreListener getStoreListener( ) {
+		return( storeListener  );
+	}
+
+	/**
+	 * Sets store listener object
+	 * 
+	 * @param storeListener the store listener object to set
+	 */
+	public void setStoreListener( StoreListener storeListener ) {
+		this.storeListener = storeListener;
+	}
+	
+	protected class CacheListener extends StoreListenerAdapter {
+		/**
+		 * @see com.gwtext.client.data.event.StoreListenerAdapter#onLoad(com.gwtext.client.data.Store, com.gwtext.client.data.Record[])
+		 */
+		@Override
+		public void onLoad( Store store, Record[] records ) {
+			if( records.length > 0 ) {
+				loadRecord( records[ 0 ] );
+			}
+		}
+
+		/**
+		 * @see com.gwtext.client.data.event.StoreListenerAdapter#onDataChanged(com.gwtext.client.data.Store)
+		 */
+		@Override
+		public void onDataChanged( Store store ) {
+			if( store.getCount( ) < 1 ) {
+				loadEmptyRecord( );
+			}
+		}		
 	}
 }
