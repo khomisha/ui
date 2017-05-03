@@ -19,6 +19,7 @@
 package org.homedns.mkh.ui.client.form;
 
 import java.util.logging.Logger;
+
 import org.homedns.mkh.dataservice.client.event.EventBus;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistry;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistryAdaptee;
@@ -30,10 +31,12 @@ import org.homedns.mkh.dataservice.shared.InsertResponse;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.RetrieveResponse;
 import org.homedns.mkh.ui.client.ChildView;
+import org.homedns.mkh.ui.client.cache.RecordUtil;
 import org.homedns.mkh.ui.client.cache.WidgetStore;
 import org.homedns.mkh.ui.client.event.SelectRowEvent;
 import org.homedns.mkh.ui.client.event.SelectRowEvent.SelectRowHandler;
 import org.homedns.mkh.ui.client.grid.OnSelectRowCmd;
+
 import com.google.gwt.core.client.Scheduler;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtext.client.data.Record;
@@ -111,7 +114,10 @@ public class ChildBoundForm extends BoundForm implements ChildView, SelectRowHan
 		WidgetStore store = ( WidgetStore )getCache( );
 		store.filter( sMasterPK, sMasterPKValue, false );
 		Record rec = store.getAt( 0 );
-		LOG.config( getID( ).getName( ) + ": onSelectRow: " + ( ( rec == null ) ? "null record" : "not null record" ) );
+		LOG.config( 
+			LOG.getName( ) + ": " + getID( ).getName( ) + ": onSelectRowAction: " + 
+			( ( rec == null ) ? "null record" : RecordUtil.record2String( rec ) ) 
+		);
 		if( rec == null ) {
 			loadEmptyRecord( );
 		} else {
@@ -125,6 +131,19 @@ public class ChildBoundForm extends BoundForm implements ChildView, SelectRowHan
 	@Override
 	public Record getParentRec( ) {
 		return( parentRec );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#onResponse(org.homedns.mkh.dataservice.shared.Response)
+	 */
+	@Override
+	public void onResponse( Response response ) {
+		setResponse( response );
+		if( response.getResult( ) != Response.FAILURE ) {
+			if( isRendered( ) ) {
+				refresh( );
+			}
+		}
 	}
 
 	/**

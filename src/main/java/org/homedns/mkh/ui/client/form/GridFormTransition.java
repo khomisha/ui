@@ -59,6 +59,7 @@ public class GridFormTransition extends Transition {
 				form.setVisibleButton( CONSTANTS.cancel( ), true );
 				form.setDisabledFields( false );
 				form.getForm( ).reset( );
+				form.initValues( );
 				form.getFields( )[ 0 ].focus( );
 			}
 		}

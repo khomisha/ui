@@ -29,7 +29,6 @@ import org.homedns.mkh.dataservice.client.view.ViewCache;
 import org.homedns.mkh.dataservice.client.view.ViewDesc;
 import org.homedns.mkh.dataservice.shared.Request;
 import org.homedns.mkh.dataservice.shared.CUDRequest;
-import org.homedns.mkh.dataservice.shared.RequestFactory;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Data;
 import org.homedns.mkh.dataservice.shared.Id;
@@ -38,9 +37,8 @@ import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.RecordUtil;
 import org.homedns.mkh.ui.client.cache.WidgetStore;
 import org.homedns.mkh.ui.client.command.CommandFactory;
+import org.homedns.mkh.ui.client.command.CommandScheduler;
 import org.homedns.mkh.ui.client.command.RetrieveCmd;
-import org.homedns.mkh.ui.client.grid.GridConfig;
-
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
@@ -69,6 +67,7 @@ public class BoundForm extends BaseForm implements View {
 	private Response response;
 	private boolean bBatch = false;
 	private StoreListener storeListener;
+	private Command retrieveCmd;
 
 	/**
 	 * @param id
@@ -92,7 +91,11 @@ public class BoundForm extends BaseForm implements View {
 		FormConfig cfg = getFormConfig( );
 		addFields( ( String[] )cfg.getAttribute( FormConfig.FIELD_LIST ) );
 		addButtons( ( CmdTypeItem[] )cfg.getAttribute( FormConfig.BUTTONS ) );
-		setBatchUpdate( ( Boolean )cfg.getAttribute( GridConfig.BATCH_UPDATE ) );		
+		setBatchUpdate( ( Boolean )cfg.getAttribute( FormConfig.BATCH_UPDATE ) );		
+		int iDelay = ( Integer )cfg.getAttribute( FormConfig.SCHEDULE_RETRIEVE_CMD );
+		if( iDelay > 0 ) {
+			CommandScheduler.get( ).addCmd2Schedule( retrieveCmd, iDelay );
+		}
 	}
 
 	/**
@@ -200,6 +203,21 @@ public class BoundForm extends BaseForm implements View {
 	}
 
 	/**
+	 * Fills specified panel with fields
+	 * 
+	 * @param panel
+	 *            the target panel
+	 * @param asField
+	 *            fields names array
+	 */
+	public void fillPanel( Panel panel, String[] asField ) {
+		for( String sField : asField ) {
+			Field field = getField( sField );
+			panel.add( field, new AnchorLayoutData( "95%" ) );
+		}
+	}
+
+	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#getSavingData(org.homedns.mkh.dataservice.shared.Request)
 	 */
 	@Override
@@ -265,7 +283,9 @@ public class BoundForm extends BaseForm implements View {
 	*/
 	public void loadRecord( Record record ) {
 		currentRecord = record;
-		getForm( ).loadRecord( record );
+		if( isRendered( ) ) {
+			getForm( ).loadRecord( record );
+		}
 	}
 
 	/**
@@ -277,19 +297,15 @@ public class BoundForm extends BaseForm implements View {
 
 	/**
 	 * Default implementation sets retrieval arguments and filtering condition
-	 * if any isn't null
 	 * 
 	 * @see org.homedns.mkh.dataservice.client.view.View#onInit()
 	 */
 	@Override
 	public Request onInit( ) {
-		RetrieveRequest request = ( RetrieveRequest )RequestFactory.create( 
-			RetrieveRequest.class 
-		);
-		Data args = ( Data )getFormConfig( ).getAttribute( FormConfig.ARGS );
-		if( args != null ) {
-			request.setArgs( args );
-		}
+		retrieveCmd = CommandFactory.create( RetrieveCmd.class, this );
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		setArgs( ( Data )getFormConfig( ).getAttribute( FormConfig.ARGS ) );
+		request.setArgs( getArgs( ) );
 		return( request );
 	}
 
@@ -300,6 +316,10 @@ public class BoundForm extends BaseForm implements View {
 	public void onResponse( Response response ) {
 		this.response = response;
 		if( response.getResult( ) != Response.FAILURE ) {
+			WidgetStore store = ( WidgetStore )getCache( );
+			if( store != null ) {
+				setCurrentRecord( store.getAt( 0 ) );
+			}
 			if( isRendered( ) ) {
 				refresh( );
 			}
@@ -403,8 +423,7 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void reload( ) {
-		Command cmd = CommandFactory.create( RetrieveCmd.class, this );
-		cmd.execute( );
+		retrieveCmd.execute( );
 	}
 
 	/**

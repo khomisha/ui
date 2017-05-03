@@ -62,6 +62,14 @@ public class GridConfig extends WidgetConfig {
 	* No toolbar flag doesn't sense if paging switch on, default false
 	*/
 	public static final Integer NO_TOOLBAR = 38;
+	/**
+	* Header menu flag, default true
+	*/
+	public static final Integer HEADER_MENU = 39;
+	/**
+	* Sortable flag, default true
+	*/
+	public static final Integer IS_SORTABLE = 40;
 	
 	public GridConfig( ) {
 		super( );
@@ -78,5 +86,7 @@ public class GridConfig extends WidgetConfig {
 		setAttribute( STRIPE_ROWS, true );
 		setAttribute( AUTO_SCROLL, true );
 		setAttribute( NO_TOOLBAR, false );
+		setAttribute( HEADER_MENU, true );
+		setAttribute( IS_SORTABLE, true );
 	}
 }

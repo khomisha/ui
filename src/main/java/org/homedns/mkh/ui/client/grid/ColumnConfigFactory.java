@@ -46,7 +46,7 @@ public class ColumnConfigFactory {
 		if( "".equals( sStyle ) ) {
 			colConfig.setHidden( true );
 		} else {
-			colConfig.setSortable( true );
+//			colConfig.setSortable( true );
 			colConfig.setHeader( col.getCaption( ) );
 			if( Column.CHECKBOX.equals( sStyle ) ) {
 				// shows checkbox in grid

@@ -60,6 +60,7 @@ public class GridImpl extends AbstractGridImpl {
 
 	private Filter filter;
 	private BaseMenu menu;
+	boolean bRemoteFilter;
 	
 	/**
 	 * @param cfg
@@ -79,15 +80,14 @@ public class GridImpl extends AbstractGridImpl {
 		final GridPanel grid = getGrid( ) ;
 		GridConfig cfg = getConfiguration( );
 		grid.stripeRows( true );
+		bRemoteFilter = ( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER );
 		if( 
-			( Boolean )cfg.getAttribute( GridConfig.FILTER ) || 
-			( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER ) 
+			( Boolean )cfg.getAttribute( GridConfig.FILTER ) || bRemoteFilter 
 		) {
 			filter = new Filter( ( ( View )grid ) );
 			grid.addPlugin( filter );
 		}
 //		setSort( );
-		boolean bRemoteFilter = ( Boolean )cfg.getAttribute( GridConfig.REMOTE_FILTER );
 		if( isPaging( ) ) {
 			Paging pagingGrid = ( Paging )grid;
 			PagingTBar ptbar = new PagingTBar( pagingGrid );
@@ -208,7 +208,9 @@ public class GridImpl extends AbstractGridImpl {
 	protected String getCondition( ) {
 		String sCondition = null;
 		if( filter != null ) {
-			sCondition = filter.getCondition( );
+			if( bRemoteFilter ) {
+				sCondition = filter.getCondition( );
+			}
 		}
 		return( sCondition );
 	}

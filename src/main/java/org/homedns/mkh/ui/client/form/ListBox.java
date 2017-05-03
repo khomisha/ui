@@ -18,8 +18,11 @@
 
 package org.homedns.mkh.ui.client.form;
 
+import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Value;
+import org.homedns.mkh.ui.client.UIMessages;
+
 import com.gwtext.client.data.MemoryProxy;
 import com.gwtext.client.data.SimpleStore;
 import com.gwtext.client.data.Store;
@@ -30,6 +33,7 @@ import com.gwtext.client.widgets.form.ComboBox;
  *
  */
 public class ListBox extends ComboBox {
+	private static final UIMessages MESSAGES = ( UIMessages )AbstractEntryPoint.getMessages( );
 
 	/**
 	 * @param col
@@ -66,7 +70,7 @@ public class ListBox extends ComboBox {
 		setSelectOnFocus( true );
 		setEditable( false );
 		setForceSelection( true );
-		setValueNotFoundText( "" );
+		setValueNotFoundText( MESSAGES.noValue( ) );
 		setResizable( true );
 		setMinListWidth( 400 );
 		setListWidth( getWidth( ) );		

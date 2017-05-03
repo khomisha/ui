@@ -18,6 +18,7 @@
 
 package org.homedns.mkh.ui.client.command;
 
+import org.homedns.mkh.dataservice.shared.Request;
 import com.google.gwt.user.client.Command;
 
 /**
@@ -25,7 +26,8 @@ import com.google.gwt.user.client.Command;
  *
  */
 public abstract class GenericCommand< T > implements Command {
-	private T _param;
+	private T param;
+	private Request request;
 	
 	public GenericCommand( ) {
 	}
@@ -42,7 +44,7 @@ public abstract class GenericCommand< T > implements Command {
 	 * @param param the command parameter to set
 	 */
 	public void setParam( T param ) {
-		_param = param;
+		this.param = param;
 	}
 	
 	/**
@@ -51,6 +53,24 @@ public abstract class GenericCommand< T > implements Command {
 	 * @return the command parameter
 	 */
 	public T getParam( ) {
-		return( _param );
+		return( param );
+	}
+
+	/**
+	 * Returns request
+	 * 
+	 * @return the request
+	 */
+	public Request getRequest( ) {
+		return( request );
+	}
+
+	/**
+	 * Sets request
+	 * 
+	 * @param request the request to set
+	 */
+	public void setRequest( Request request ) {
+		this.request = request;
 	}
 }

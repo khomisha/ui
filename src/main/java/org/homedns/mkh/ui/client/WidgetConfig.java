@@ -53,11 +53,11 @@ public class WidgetConfig extends AttributeMap< Integer, Object > implements Con
 	*/
 	public static final Integer ARGS = 5;
 	/**
-	* Initial arguments values
+	* Widget border flag, default false
 	*/
 	public static final Integer BORDER = 6;
 	/**
-	* Initial arguments values
+	* Widget auto scroll flag, default false
 	*/
 	public static final Integer AUTO_SCROLL = 7;
 	/**
@@ -65,14 +65,14 @@ public class WidgetConfig extends AttributeMap< Integer, Object > implements Con
 	*/
 	public static final Integer BATCH_UPDATE = 8;
 	/**
-	* Widget custom css using flag, default false
+	* Schedule retrieve command delay in millis, default 0 means not used
 	*/
-	public static final Integer CUSTOM_CSS = 9;
+	public static final Integer SCHEDULE_RETRIEVE_CMD = 9;
 
 	public WidgetConfig( ) {
 		setAttribute( AUTO_WIDTH, true );
 		setAttribute( BORDER, true );
 		setAttribute( BATCH_UPDATE, false );
-		setAttribute( CUSTOM_CSS, false );
+		setAttribute( SCHEDULE_RETRIEVE_CMD, 0 );
 	}
 }

@@ -18,6 +18,8 @@
 
 package org.homedns.mkh.ui.client.form;
 
+import java.util.List;
+
 import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
 import org.homedns.mkh.dataservice.client.event.EventBus;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistry;
@@ -57,6 +59,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	private State state = States.READONLY;
 	private Transition transition;
 	private Command insertCmd, updateCmd;
+	private List< FieldInitValue > initValues;
 
 	/**
 	 * {@link org.homedns.mkh.ui.client.form.BoundForm}
@@ -198,6 +201,35 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	@Override
 	public void changeStateTo( State newState ) {
 		transition.doTransition( newState, this );
+	}
+	
+	/**
+	 * Sets initial values
+	 * 
+	 * @param initValues the initial values
+	 */
+	public void setInitValues( List< FieldInitValue > initValues ) {
+		this.initValues = initValues;
+	}
+	
+	/**
+	 * Returns initial values
+	 * 
+	 * @return the initial values
+	 */
+	public List< FieldInitValue > getInitValues( ) {
+		return( initValues );
+	}
+
+	/**
+	 * Sets initials values (if exist) for form fields
+	 */
+	public void initValues( ) {
+		if( initValues != null && !initValues.isEmpty( ) ) {
+			for( FieldInitValue value : initValues ) {
+				value.setInitValue( );
+			}
+		}
 	}
 	
 	protected class GridFormCacheListener extends CacheListener {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Mikhail Khodonov
+ * Copyright 2013-2017 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -21,7 +21,6 @@ package org.homedns.mkh.ui.client.grid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.shared.CUDRequest;
 import org.homedns.mkh.dataservice.shared.DeleteRequest;
@@ -142,21 +141,21 @@ public class EditorGridImpl extends GridImpl {
 	/**
 	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setRemovedRecords(java.util.List)
 	 */
-	public void setRemovedRecords( List< Record > removedRecords ) {
+	protected void setRemovedRecords( List< Record > removedRecords ) {
 		this.removedRecords = removedRecords;
 	}
 
 	/**
 	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setAddedRecords(java.util.List)
 	 */
-	public void setAddedRecords( List< Record > addedRecords ) {
+	protected void setAddedRecords( List< Record > addedRecords ) {
 		this.addedRecords = addedRecords;
 	}
 
 	/**
 	 * @see org.homedns.mkh.ui.client.grid.EditorGrid#setUpdatedRecords(java.util.List)
 	 */
-	public void setUpdatedRecords( List< Record > updatedRecords ) {
+	protected void setUpdatedRecords( List< Record > updatedRecords ) {
 		this.updatedRecords = updatedRecords;
 	}
 
@@ -207,7 +206,7 @@ public class EditorGridImpl extends GridImpl {
 
 				@Override
 				public void onRemove( Store store, Record record, int index ) {
-					if( addedRecords.contains( record ) ) {
+					if( contains( addedRecords, record ) ) {
 						addedRecords.remove( record );
 					} else {
 						removedRecords.add( record );
@@ -215,12 +214,10 @@ public class EditorGridImpl extends GridImpl {
 				}
 
 				@Override
-				public void onUpdate( 
-					Store store, Record record, Operation operation 
-				) {
+				public void onUpdate( Store store, Record record, Operation operation ) {
 					if( 
-						!addedRecords.contains( record ) && 
-						!updatedRecords.contains( record ) 
+						!contains( addedRecords, record ) && 
+						!contains( updatedRecords, record ) 
 					) {
 						updatedRecords.add( record );
 					}					
@@ -230,11 +227,31 @@ public class EditorGridImpl extends GridImpl {
 	}
 	
 	/**
+	 * Returns true if specified record is found in target list and false
+	 * otherwise
+	 * 
+	 * @param list
+	 *            the target list
+	 * @param searched
+	 *            the searched entry
+	 * 
+	 * @return true if specified record is found in target list and false otherwise
+	 */
+	private boolean contains( List< Record > list, Record searched ) {
+		for( Record record : list ) {
+			if( searched.getId( ).equals( record.getId( ) ) ) {
+				return( true );
+			}
+		}
+		return( false );
+	}
+	
+	/**
 	 * Returns true if grid content has been changed and false otherwise
 	 * 
 	 * @return true or false
 	 */
-	public boolean isDirty( ) {
+	protected boolean isDirty( ) {
 		return( !( updatedRecords.isEmpty( ) && removedRecords.isEmpty( ) && addedRecords.isEmpty( ) ) );
 	}
 	

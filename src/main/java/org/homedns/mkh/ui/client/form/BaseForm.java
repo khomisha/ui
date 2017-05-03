@@ -20,10 +20,8 @@ package org.homedns.mkh.ui.client.form;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.homedns.mkh.ui.client.CSSHelper;
 import org.homedns.mkh.ui.client.CmdTypeItem;
 import org.homedns.mkh.ui.client.command.CommandFactory;
-import org.homedns.mkh.ui.client.grid.GridConfig;
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Position;
@@ -256,9 +254,6 @@ public class BaseForm extends FormPanel {
 		setButtonAlign( ( Position )cfg.getAttribute( FormConfig.BUTTON_ALIGN ) );
 		setTrackResetOnLoad( ( Boolean )cfg.getAttribute( FormConfig.TRACK_ON_RESET ) );
 		setAutoScroll( ( Boolean )cfg.getAttribute( FormConfig.AUTO_SCROLL ) );		
-		if( ( Boolean )cfg.getAttribute( GridConfig.CUSTOM_CSS ) ) {
-			CSSHelper.getCSSInjector( ).injectCSS( this );
-		}
 	}
 
 	/**

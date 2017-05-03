@@ -22,7 +22,6 @@ import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.client.view.ViewCache;
 import org.homedns.mkh.dataservice.shared.InsertResponse;
 import org.homedns.mkh.dataservice.shared.Request;
-import org.homedns.mkh.dataservice.shared.RequestFactory;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Data;
 import org.homedns.mkh.dataservice.shared.RetrieveRequest;
@@ -30,7 +29,9 @@ import org.homedns.mkh.ui.client.ChildView;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.WidgetStore;
 import org.homedns.mkh.ui.client.command.CommandFactory;
+import org.homedns.mkh.ui.client.command.CommandScheduler;
 import org.homedns.mkh.ui.client.command.RetrieveCmd;
+
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Store;
@@ -38,7 +39,6 @@ import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
 import com.gwtext.client.widgets.grid.ColumnModel;
 import com.gwtext.client.widgets.grid.GridPanel;
-import org.homedns.mkh.ui.client.CSSHelper;
 
 /**
  * Implements abstract grid functionality
@@ -50,7 +50,7 @@ public abstract class AbstractGridImpl {
 	private GridConfig cfg;
 	private GridPanel grid;
 	private Data args;
-	private Command cmd;
+	private Command afterInitCmd, retrieveCmd;
 	private ViewCache cache;
 	private Response response;
 	private int iSelectedRow = 0;
@@ -95,7 +95,6 @@ public abstract class AbstractGridImpl {
 	 * @see org.homedns.mkh.dataservice.client.Response#init(org.homedns.mkh.dataservice.client.DataBufferDesc)
 	 */
 	protected void init( ) {
-		grid.setColumnModel( new ColumnModel( getColConfigs( ) ) );
 		config( );
 	}
 
@@ -135,11 +134,15 @@ public abstract class AbstractGridImpl {
 	 * Applies configuration parameters to the parent grid
 	 */
 	protected void config( ) {
+		ColumnModel cm = new ColumnModel( getColConfigs( ) );
+		cm.setDefaultSortable( ( Boolean )cfg.getAttribute( GridConfig.IS_SORTABLE ) );
+		grid.setColumnModel( cm );
 		grid.setAutoWidth( ( Boolean )cfg.getAttribute( GridConfig.AUTO_WIDTH ) );
 		grid.setAutoHeight( ( Boolean )cfg.getAttribute( GridConfig.AUTO_HEIGHT ) );
 		grid.setBorder( ( Boolean )cfg.getAttribute( GridConfig.BORDER ) );
 		grid.setStripeRows( ( Boolean )cfg.getAttribute( GridConfig.STRIPE_ROWS ) );		
 		grid.setAutoScroll( ( Boolean )cfg.getAttribute( GridConfig.AUTO_SCROLL ) );
+		grid.setEnableHdMenu( ( Boolean )cfg.getAttribute( GridConfig.HEADER_MENU ) );
 		( ( View )grid ).setBatchUpdate( ( Boolean )cfg.getAttribute( GridConfig.BATCH_UPDATE ) );		
 		int iWidth = ( Integer )cfg.getAttribute( GridConfig.WIDTH );
 		if( iWidth > 0 ) {
@@ -153,8 +156,9 @@ public abstract class AbstractGridImpl {
 		if( sTitle != null ) {
 			grid.setTitle( sTitle );
 		}
-		if( ( Boolean )cfg.getAttribute( GridConfig.CUSTOM_CSS ) ) {
-			CSSHelper.getCSSInjector( ).injectCSS( grid );
+		int iDelay = ( Integer )cfg.getAttribute( GridConfig.SCHEDULE_RETRIEVE_CMD );
+		if( iDelay > 0 ) {
+			CommandScheduler.get( ).addCmd2Schedule( retrieveCmd, iDelay );
 		}
 	}
 	
@@ -191,14 +195,21 @@ public abstract class AbstractGridImpl {
 	 * @see org.homedns.mkh.dataservice.client.view.View#onInit()
 	 */
 	protected Request onInit( ) {
-		View view = ( View )grid;
-		RetrieveRequest request = ( RetrieveRequest )RequestFactory.create( 
-			RetrieveRequest.class 
-		);
-		request.setID( view.getID( ) );
+		retrieveCmd = CommandFactory.create( RetrieveCmd.class, grid );
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
 		setArgs( ( Data )cfg.getAttribute( GridConfig.ARGS ) );
 		request.setArgs( getArgs( ) );
 		return( request );
+
+//		View view = ( View )_grid;
+//		RetrieveRequest request = ( RetrieveRequest )RequestFactory.create( 
+//			RetrieveRequest.class 
+//		);
+//		request.setID( view.getID( ) );
+//		setArgs( ( Data )_cfg.getAttribute( GridConfig.ARGS ) );
+//		request.setArgs( getArgs( ) );
+//		return( request );
+	
 	}
 	
 	/**
@@ -208,7 +219,7 @@ public abstract class AbstractGridImpl {
 		if( grid instanceof ChildView ) {
 			( ( ChildView )grid ).onSelectRowAction( );
 		}
-		grid.getView( ).refresh( );
+//		grid.getView( ).refresh( );
 		Response response = getResponse( );
 		WidgetStore store = ( WidgetStore )cache;
 		if( response instanceof InsertResponse ) {
@@ -232,8 +243,7 @@ public abstract class AbstractGridImpl {
 	 * @see org.homedns.mkh.dataservice.client.view.View#reload()
 	 */
 	protected void reload( ) {
-		Command cmd = CommandFactory.create( RetrieveCmd.class, grid );
-		cmd.execute( );
+		retrieveCmd.execute( );
 	}
 	
 	/**
@@ -266,8 +276,8 @@ public abstract class AbstractGridImpl {
 	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#setAfterInitCommand(Command)
 	 */
-	protected void setAfterInitCommand( Command cmd ) {
-		this.cmd = cmd;
+	protected void setAfterInitCommand( Command afterInitCmd ) {
+		this.afterInitCmd = afterInitCmd;
 	}
 	
 	/**
@@ -276,7 +286,7 @@ public abstract class AbstractGridImpl {
 	 * @return the command
 	 */
 	protected Command getAfterInitCommand( ) {
-		return( cmd );
+		return( afterInitCmd );
 	}
 	
 	/**

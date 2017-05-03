@@ -25,7 +25,6 @@ import org.homedns.mkh.dataservice.client.view.ViewCache;
 import org.homedns.mkh.dataservice.client.view.ViewDesc;
 import org.homedns.mkh.dataservice.shared.Response;
 import org.homedns.mkh.dataservice.shared.Id;
-import org.homedns.mkh.dataservice.shared.ReturnValue;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.gwtext.client.data.ArrayReader;
@@ -253,21 +252,6 @@ public class WidgetStore extends Store implements ViewCache {
 	 */
 	public String record2String( int iIndex ) {
 		return( RecordUtil.record2String( getAt( iIndex ) ) );
-	}
-	
-	/**
-	 * Finds record index by primary key value (surrogate key)
-	 * 
-	 * @param pkValue
-	 *            the return value object contains primary key value
-	 * 
-	 * @return the record index or -1
-	 */
-	public int getRecordByPK( ReturnValue pkValue ) {
-		if( pkValue.isEmpty( ) ) {
-			return( -1 );
-		}
-		return( getRecordByPK( pkValue.get( 0 ) ) );
 	}
 	
 	/**

@@ -59,6 +59,16 @@ public class SingleViewPanel extends GenericPanel {
 	}
 
 	/**
+	 * Returns view
+	 * 
+	 * @return the view
+	 */
+	public View getView( ) {
+		ViewTag tag = getViewTag( ).get( 0 );
+		return( getView( tag.getName( ), tag.getType( ) ) );
+	}
+	
+	/**
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override

@@ -32,6 +32,8 @@ import org.homedns.mkh.dataservice.shared.RetrieveRequest;
 public class RetrieveCmd extends GenericCommand< View > {
 
 	public RetrieveCmd( ) {
+		Request request = RequestFactory.create( RetrieveRequest.class );
+		setRequest( request );
 	}
 
 	/**
@@ -39,7 +41,7 @@ public class RetrieveCmd extends GenericCommand< View > {
 	 */
 	@Override
 	public void execute( ) {
-		Request request = RequestFactory.create( RetrieveRequest.class );
+		RetrieveRequest request = ( RetrieveRequest )getRequest( );
 		request.setID( getParam( ).getID( ) );
 		RequestSender sender = SendBinder.bind( request );
 		sender.setView( getParam( ) );
