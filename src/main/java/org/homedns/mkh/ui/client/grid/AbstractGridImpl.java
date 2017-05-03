@@ -92,7 +92,7 @@ public abstract class AbstractGridImpl {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#init(org.homedns.mkh.dataservice.client.DataBufferDesc)
+	 * Inits grid 
 	 */
 	protected void init( ) {
 		config( );

@@ -23,7 +23,7 @@ import com.gwtext.client.data.DataProxy;
 import com.gwtext.client.util.JavaScriptObjectHelper;
 
 /**
- * @see com.gwtextux.client.data.PagingMemoryProxy
+ * @see com.gwtext.client.data.DataProxy
  *
  */
 public class CustomPagingMemoryProxy extends DataProxy {

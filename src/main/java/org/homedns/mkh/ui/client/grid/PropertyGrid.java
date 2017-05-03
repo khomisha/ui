@@ -66,7 +66,7 @@ public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#setID(Id)
+	 * @see org.homedns.mkh.dataservice.client.view.View#setID(org.homedns.mkh.dataservice.shared.Id)
 	 */
 	@Override
 	public void setID( Id id ) {
@@ -74,7 +74,7 @@ public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getID()
+	 * @see org.homedns.mkh.dataservice.client.view.View#getID()
 	 */
 	@Override
 	public Id getID( ) {
@@ -82,7 +82,7 @@ public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#init(org.homedns.mkh.dataservice.client.DataBufferDesc)
+	 * @see org.homedns.mkh.dataservice.client.view.View#init(org.homedns.mkh.dataservice.client.view.ViewDesc)
 	 */
 	@Override
 	public void init( ViewDesc desc ) {
@@ -91,7 +91,7 @@ public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getDescription()
+	 * @see org.homedns.mkh.dataservice.client.view.View#getDescription()
 	 */
 	@Override
 	public ViewDesc getDescription( ) {

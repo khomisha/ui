@@ -202,7 +202,7 @@ public class GridImpl extends AbstractGridImpl {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.ui.client.filter.Filterable#getCondition()
+	 * @see org.homedns.mkh.ui.client.grid.AbstractGridImpl#getCondition()
 	 */
 	@Override
 	protected String getCondition( ) {

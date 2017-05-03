@@ -39,7 +39,7 @@ public class RowLayoutPanel extends GenericPanel {
 	}
 
 	/**
-	 * @param iSouthPanelHeight the second panel initial height
+	 * @param sSecondPanelHeight the second panel initial height
 	 */
 	public RowLayoutPanel( String sSecondPanelHeight ) {
 		this( );		

@@ -84,9 +84,9 @@ public class MasterMultiChildPanel extends GenericMasterChildPanel {
 	}
 
 	/**
-	 * Creates child view and binds it to the master grid
+	 * Creates child views and binds it to the master grid
 	 * 
-	 * @param sChildGrid the child view tag object
+	 * @param tags the child views tags list
 	 * @param masterGrid the master grid
 	 */
 	@Override

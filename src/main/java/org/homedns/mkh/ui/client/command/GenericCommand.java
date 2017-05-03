@@ -33,7 +33,7 @@ public abstract class GenericCommand< T > implements Command {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Command#execute()
+	 * @see com.google.gwt.user.client.Command#execute()
 	 */
 	@Override
 	public abstract void execute( );

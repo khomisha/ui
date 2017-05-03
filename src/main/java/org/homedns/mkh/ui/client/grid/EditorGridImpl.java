@@ -256,7 +256,7 @@ public class EditorGridImpl extends GridImpl {
 	}
 	
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getSavingData(org.homedns.mkh.dataservice.shared.Request)
+	 * @see org.homedns.mkh.dataservice.client.view.View#getSavingData(org.homedns.mkh.dataservice.shared.Request)
 	 */
 	protected void getSavingData( Request request ) {
 		String s = null;

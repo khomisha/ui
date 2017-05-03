@@ -69,7 +69,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#setID(Id)
+	 * @see org.homedns.mkh.dataservice.client.view.View#setID(org.homedns.mkh.dataservice.shared.Id)
 	 */
 	@Override
 	public void setID( Id id ) {
@@ -77,7 +77,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getID()
+	 * @see org.homedns.mkh.dataservice.client.view.View#getID()
 	 */
 	@Override
 	public Id getID( ) {
@@ -85,7 +85,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#init(org.homedns.mkh.dataservice.client.DataBufferDesc)
+	 * @see org.homedns.mkh.dataservice.client.view.View#init(org.homedns.mkh.dataservice.client.view.ViewDesc)
 	 */
 	@Override
 	public void init( ViewDesc desc ) {
@@ -94,7 +94,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getDescription()
+	 * @see org.homedns.mkh.dataservice.client.view.View#getDescription()
 	 */
 	@Override
 	public ViewDesc getDescription( ) {
@@ -102,7 +102,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.Response#getSavingData()
+	 * @see org.homedns.mkh.dataservice.client.view.View#getSavingData(org.homedns.mkh.dataservice.shared.Request)
 	 */
 	@Override
 	public void getSavingData( Request request ) {
@@ -135,7 +135,7 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.dataservice.client.view.View#refresh(org.homedns.mkh.dataservice.shared.Response)
+	 * @see org.homedns.mkh.dataservice.client.view.View#onResponse(org.homedns.mkh.dataservice.shared.Response)
 	 */
 	@Override
 	public void onResponse( Response response ) {
@@ -377,9 +377,9 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	 * 
 	 * @param iType
 	 *            the records list type
-	 *            {@link org.homedns.mkh.ui.client.grid.EditorGrid#REMOVED,
-	 *            org.homedns.mkh.ui.client.grid.EditorGrid#UPDATED,
-	 *            org.homedns.mkh.ui.client.grid.EditorGrid#ADDED}
+	 *            {@link org.homedns.mkh.ui.client.grid.EditorGrid#REMOVED},
+	 *            {@link org.homedns.mkh.ui.client.grid.EditorGrid#UPDATED},
+	 *            {@link org.homedns.mkh.ui.client.grid.EditorGrid#ADDED}
 	 * @param record
 	 *            the record to remove
 	 */
