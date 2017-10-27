@@ -107,6 +107,7 @@ public class ChildGrid extends Grid implements ChildView, SelectRowHandler, RPCR
 		}
 		LOG.config( getID( ).getName( ) + ": filter: " + sMasterPKValue );
 		store.filter( sMasterPK, sMasterPKValue, false );
+//		getImplementation( ).selectRow( 0 );
 	}
 	
 	/**
@@ -135,7 +136,8 @@ public class ChildGrid extends Grid implements ChildView, SelectRowHandler, RPCR
 			if( response instanceof InsertResponse || response instanceof DeleteResponse ) {
 				reload( );
 			}
-			if( response instanceof RetrieveResponse && isRendered( ) ) {
+//			if( response instanceof RetrieveResponse && isRendered( ) ) {
+			if( response instanceof RetrieveResponse ) {
 				reload( );				
 			}
 		}

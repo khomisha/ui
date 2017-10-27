@@ -248,7 +248,7 @@ public class BoundForm extends BaseForm implements View {
 	 * 
 	 * @param record the record to set
 	 */
-	protected void setCurrentRecord( Record record ) {
+	public void setCurrentRecord( Record record ) {
 		currentRecord = record;
 	}
 	

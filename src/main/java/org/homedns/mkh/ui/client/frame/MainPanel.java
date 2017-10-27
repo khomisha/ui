@@ -24,6 +24,7 @@ import org.homedns.mkh.dataservice.client.event.HandlerRegistry;
 import org.homedns.mkh.ui.client.event.NavigationEvent;
 import org.homedns.mkh.ui.client.event.NavigationEvent.NavigationHandler;
 import org.homedns.mkh.ui.client.frame.BasePanel.Token;
+
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -40,16 +41,18 @@ import com.gwtext.client.widgets.layout.FitLayout;
  */
 @SuppressWarnings( "unchecked" )
 public abstract class MainPanel extends Panel implements NavigationHandler, HandlerRegistry {
-	private BasePanel _currentPanel;
-	private HandlerRegistryAdaptee _handlers;
-	private Timer _logoutTimer;
-	private int _iSessionTimeout;
-	private int _iRefreshTimeout;
+	private BasePanel currentPanel;
+	private HandlerRegistryAdaptee handlers;
+	private Timer logoutTimer;
+	private int iSessionTimeout;
+	private int iRefreshTimeout;
+	private String sVersion = "";
+	private String sBuildTime = "";
 
 	public MainPanel( ) {
 		setLayout( new FitLayout( ) );
 		setBorder( false );
-		_handlers = new HandlerRegistryAdaptee( );
+		handlers = new HandlerRegistryAdaptee( );
 		addHandler( EventBus.getInstance( ).addHandler( NavigationEvent.TYPE, this ) );
 	}
 
@@ -72,25 +75,25 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 			return;
 		}
 
-		if( _currentPanel != null ) {
-			if( _currentPanel.getToken( ) == panel.getToken( ) ) {
+		if( currentPanel != null ) {
+			if( currentPanel.getToken( ) == panel.getToken( ) ) {
 				// This is the same panel, do nothing
 				return;
 			}
 		}
 
 		// Remove the old panel from the display area.
-		if( _currentPanel != null ) {
-			_currentPanel.onRemove( );
-		  	remove( _currentPanel, true );
+		if( currentPanel != null ) {
+			currentPanel.onRemove( );
+		  	remove( currentPanel, true );
 		}
 
 	    // Get the new panel instance
-	    _currentPanel = panel;
+	    currentPanel = panel;
 
 		// Display the new panel.
-		add( _currentPanel );
-		_currentPanel.onShow( );
+		add( currentPanel );
+		currentPanel.onShow( );
 		doLayout( );
 	}
 
@@ -100,7 +103,39 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	* @return current panel
 	*/
 	public BasePanel getCurrentPanel( ) {
-		return( _currentPanel );
+		return( currentPanel );
+	}
+
+	/**
+	 * Returns application version
+	 * 
+	 * @return the application version
+	 */
+	public String getVersion( ) {
+		return( sVersion );
+	}
+
+	/**
+	 * Sets application version 
+	 * 
+	 * @param sVersion the application version to set
+	 */
+	public void setVersion( String sVersion ) {
+		this.sVersion = sVersion;
+	}
+
+	/**
+	 * @return the application build time
+	 */
+	public String getBuildTime( ) {
+		return( sBuildTime );
+	}
+
+	/**
+	 * @param sBuildTime the application build time to set
+	 */
+	public void setBuildTime( String sBuildTime ) {
+		this.sBuildTime = sBuildTime;
 	}
 
 	/**
@@ -110,7 +145,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 *            the logout timer to set
 	 */
 	public void setLogoutTimer( Timer logoutTimer ) {
-		_logoutTimer = logoutTimer;
+		this.logoutTimer = logoutTimer;
 	}
 
 	/**
@@ -121,7 +156,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 *            the session timeout to set
 	 */
 	public void setSessionTimeout( int iSessionTimeout ) {
-		_iSessionTimeout = iSessionTimeout;
+		this.iSessionTimeout = iSessionTimeout;
 		if( iSessionTimeout > 0 ) {
 			runAutoLogout( );
 		}
@@ -133,7 +168,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 * @return the UI refresh timeout
 	 */
 	public int getRefreshTimeout( ) {
-		return( _iRefreshTimeout );
+		return( iRefreshTimeout );
 	}
 
 	/**
@@ -143,7 +178,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 *            the the UI refresh timeout to set
 	 */
 	public void setRefreshTimeout( int iRefreshTimeout ) {
-		_iRefreshTimeout = iRefreshTimeout;
+		this.iRefreshTimeout = iRefreshTimeout;
 	}
 
 	/**
@@ -176,7 +211,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 */
 	@Override
 	public void removeHandlers( ) {
-		_handlers.clear( );
+		handlers.clear( );
 	}
 
 	/**
@@ -184,7 +219,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 */
 	@Override
 	public boolean addHandler( HandlerRegistration hr ) {
-		return( _handlers.add( hr ) );		
+		return( handlers.add( hr ) );		
 	}
 	
 	/**
@@ -218,8 +253,8 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 * Re-news logout timer
 	 */
 	private void renewLogoutTimer( ) {
-		if( _logoutTimer != null ) {
-			_logoutTimer.schedule( _iSessionTimeout );
+		if( logoutTimer != null ) {
+			logoutTimer.schedule( iSessionTimeout );
 		}
 	}
 }

@@ -22,7 +22,6 @@ import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Value;
 import org.homedns.mkh.ui.client.UIMessages;
-
 import com.gwtext.client.data.MemoryProxy;
 import com.gwtext.client.data.SimpleStore;
 import com.gwtext.client.data.Store;
@@ -34,7 +33,9 @@ import com.gwtext.client.widgets.form.ComboBox;
  */
 public class ListBox extends ComboBox {
 	private static final UIMessages MESSAGES = ( UIMessages )AbstractEntryPoint.getMessages( );
-
+	
+	private String sDisplayCol, sDataCol;
+	
 	/**
 	 * @param col
 	 *            the column
@@ -51,18 +52,35 @@ public class ListBox extends ComboBox {
 	}
 	
 	/**
+	 * Returns the display column name
+	 * 
+	 * @return the display column name
+	 */
+	public String getDisplayCol( ) {
+		return( sDisplayCol );
+	}
+
+
+	/**
+	 * Returns the data column name
+	 * 
+	 * @return the data column name
+	 */
+	public String getDataCol( ) {
+		return( sDataCol );
+	}
+
+	/**
 	 * Configures list box for specified column 
 	 * 
 	 * @param col the source column
 	 */
-	protected void config( Column col ) {
-		setDisplayField( col.getDddbDisplayCol( ) );
-		setValueField( col.getName( ) );
-		Store store = createStore( 
-			col.getDddbDisplayCol( ), 
-			col.getName( ), 
-			col.getValues( ) 
-		);
+	protected void config( final Column col ) {
+		sDisplayCol = col.getDddbDisplayCol( );
+		sDataCol = col.getName( );
+		setDisplayField( sDisplayCol );
+		setValueField( sDataCol );
+		Store store = createStore( sDisplayCol, sDataCol, col.getValues( ) );
 		setStore( store );
 		setTypeAhead( true );
 		setMode( ComboBox.LOCAL );
@@ -73,7 +91,7 @@ public class ListBox extends ComboBox {
 		setValueNotFoundText( MESSAGES.noValue( ) );
 		setResizable( true );
 		setMinListWidth( 400 );
-		setListWidth( getWidth( ) );		
+		setListWidth( getWidth( ) );
 	}
 
 	/**
@@ -90,18 +108,18 @@ public class ListBox extends ComboBox {
 	/**
 	 * Creates store for column with ddlb or dddb style.
 	 * 
-	 * @param sColName
+	 * @param sDisplayCol
 	 *            the display column name
-	 * @param sDataColName
+	 * @param sDataCol
 	 *            the data column name
 	 * @param data
 	 *            the data to store
 	 * 
 	 * @return store
 	 */
-	private Store createStore( String sColName, String sDataColName, Value[] data ) {
+	private Store createStore( String sDisplayCol, String sDataCol, Value[] data ) {
 		// so many amazing things in gwtext, general purpose Store
-		// doesn't work with combobox, only SimpleStore. All fields are treated as String!
+		// doesn't work with combobox, only SimpleStore. All fields values are treated as String!
 		int iRow = 0;
 		String[][] a = new String[ data.length ][ 2 ];
 		for( Value value : data ) {
@@ -109,7 +127,7 @@ public class ListBox extends ComboBox {
 			a[ iRow ][ 1 ] = value.getDataValue( );
 			iRow++;
 		}
-		SimpleStore store = new SimpleStore( new String[] { sColName, sDataColName }, a );
+		SimpleStore store = new SimpleStore( new String[] { sDisplayCol, sDataCol }, a );
 		store.load( );
 		return( store );
 	}

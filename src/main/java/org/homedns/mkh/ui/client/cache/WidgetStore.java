@@ -267,7 +267,7 @@ public class WidgetStore extends Store implements ViewCache {
 			return( -1 );
 		}
 		String pk = _desc.getDataBufferDesc( ).getTable( ).getKey( );
-		int iIndex = find( pk, sPKValue, 0, true, false );
+		int iIndex = findExact( pk, sPKValue, 0 );
 		return( iIndex );
 	}
 

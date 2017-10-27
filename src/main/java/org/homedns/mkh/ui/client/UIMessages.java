@@ -152,11 +152,11 @@ public interface UIMessages extends com.google.gwt.i18n.client.Messages {
 	String noPage( int iType );
 
 	/**
-	* Translated "Version: {0}<br>(c) {1}".
+	* Translated "Version: {0}<br>Build: {1}<br>(c) {2}".
 	*
-	* @return translated "Version: {0}<br>(c) {1}"
+	* @return translated "Version: {0}<br>Build: {1}<br>(c) {2}"
 	*/
-	@DefaultMessage( "Version: {0}<br>(c) {1}" )
+	@DefaultMessage( "Version: {0}<br>Build: {1}<br>(c) {2}" )
 	@Key( "version" )
-	String version( String sVersion, String sCopyright );
+	String version( String sVersion, String sBuildTime, String sCopyright );
 }

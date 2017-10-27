@@ -18,10 +18,11 @@
 
 package org.homedns.mkh.ui.client.grid;
 
+import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
+import org.homedns.mkh.ui.client.UIMessages;
 import org.homedns.mkh.ui.client.form.ListBox;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
-import com.gwtext.client.util.JavaScriptObjectHelper;
 import com.gwtext.client.widgets.grid.CellMetadata;
 import com.gwtext.client.widgets.grid.Renderer;
 
@@ -30,14 +31,16 @@ import com.gwtext.client.widgets.grid.Renderer;
  *
  */
 public class DDDBRenderer implements Renderer {
-	private ListBox _listBox;
+	private static final UIMessages MESSAGES = ( UIMessages )AbstractEntryPoint.getMessages( );
+
+	private ListBox listBox;
 
 	/**
 	 * @param listBox
 	 *            the target list box
 	 */
 	public DDDBRenderer( ListBox listBox ) {
-		_listBox = listBox; 
+		this.listBox = listBox; 
 	}
 
 	/**
@@ -47,14 +50,11 @@ public class DDDBRenderer implements Renderer {
 	public String render( 
 		Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store 
 	) {
-		Store lbStore = _listBox.getStore( );
-		String[] asFields = lbStore.getFields( );
-		int iRow  = lbStore.find( asFields[ 1 ], String.valueOf( value ), 0, true, true );
-		String sDisplay = "";
+		String sDisplay = MESSAGES.noValue( );
+		Store lbStore = listBox.getStore( );
+		int iRow  = lbStore.findExact( listBox.getDataCol( ), String.valueOf( value ), 0 );
 		if( iRow > -1 ) {
-			sDisplay = lbStore.getRecordAt( iRow ).getAsString( asFields[ 0 ] );
-		} else {
-			sDisplay = JavaScriptObjectHelper.getAttribute( _listBox.getJsObj( ), "valueNotFoundText" );
+			sDisplay = lbStore.getRecordAt( iRow ).getAsString( listBox.getDisplayCol( ) );
 		}
 		return( sDisplay );
 	}

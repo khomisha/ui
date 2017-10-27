@@ -175,7 +175,7 @@ public class BaseForm extends FormPanel {
 	 */
 	public void setDisabledField( String sName, boolean bDisabled ) {
 		Field field = getForm( ).findField( sName );
-		if( field != null ) { 
+		if( field != null && field.isVisible( ) ) { 
 			field.setDisabled( bDisabled );
 		}
 	}
@@ -188,7 +188,9 @@ public class BaseForm extends FormPanel {
 	 */
 	public void setDisabledFields( boolean bDisabled ) {
 		for( Field field : getFields( ) ) {
-			field.setDisabled( bDisabled );
+			if( field.isVisible( ) ) {
+				field.setDisabled( bDisabled );
+			}
 		}
 	}
 	
