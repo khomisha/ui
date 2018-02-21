@@ -18,6 +18,9 @@
 
 package org.homedns.mkh.ui.client.grid;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.client.view.ViewCache;
 import org.homedns.mkh.dataservice.shared.InsertResponse;
@@ -45,7 +48,8 @@ import com.gwtext.client.widgets.grid.GridPanel;
  *
  */
 public abstract class AbstractGridImpl {
-	protected static final String RELOAD_BTN_ICON_CLS = "x-tbar-loading";
+	private static final Logger LOG = Logger.getLogger( AbstractGridImpl.class.getName( ) );  
+	public static final String RELOAD_BTN_ICON_CLS = "x-tbar-loading";
 
 	private GridConfig cfg;
 	private GridPanel grid;
@@ -95,7 +99,12 @@ public abstract class AbstractGridImpl {
 	 * Inits grid 
 	 */
 	protected void init( ) {
-		config( );
+		try {
+			config( );
+		}
+		catch( Exception e ) {
+			LOG.log( Level.SEVERE, e.getMessage( ), e );
+		}
 	}
 
 	/**
@@ -200,16 +209,6 @@ public abstract class AbstractGridImpl {
 		setArgs( ( Data )cfg.getAttribute( GridConfig.ARGS ) );
 		request.setArgs( getArgs( ) );
 		return( request );
-
-//		View view = ( View )_grid;
-//		RetrieveRequest request = ( RetrieveRequest )RequestFactory.create( 
-//			RetrieveRequest.class 
-//		);
-//		request.setID( view.getID( ) );
-//		setArgs( ( Data )_cfg.getAttribute( GridConfig.ARGS ) );
-//		request.setArgs( getArgs( ) );
-//		return( request );
-	
 	}
 	
 	/**

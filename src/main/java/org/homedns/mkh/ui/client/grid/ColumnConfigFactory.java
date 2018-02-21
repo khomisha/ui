@@ -19,7 +19,9 @@
 package org.homedns.mkh.ui.client.grid;
 
 import org.homedns.mkh.dataservice.client.Column;
+import org.homedns.mkh.dataservice.client.Type;
 import org.homedns.mkh.ui.client.form.ListBox;
+
 import com.gwtext.client.widgets.form.Field;
 
 /**
@@ -48,6 +50,10 @@ public class ColumnConfigFactory {
 		} else {
 //			colConfig.setSortable( true );
 			colConfig.setHeader( col.getCaption( ) );
+			int iLimit = col.getLimit( );
+			if( iLimit != 0 ) {
+				colConfig.setWidth( iLimit );
+			}
 			if( Column.CHECKBOX.equals( sStyle ) ) {
 				// shows checkbox in grid
 				colConfig.setRenderer( new CheckboxRenderer( ) );
@@ -59,6 +65,10 @@ public class ColumnConfigFactory {
 				Column.EDIT_TS.equals( sStyle )
 			) {
 				colConfig.setRenderer( new DateRenderer( sStyle ) );
+			} else if( Column.EDIT.equals( sStyle ) ) {
+				if( col.getColType( ) == Type.DOUBLE && !"".equals( col.getPattern( ) ) ) {
+					colConfig.setRenderer( new DoubleRenderer( col.getPattern( ) ) );									
+				}
 			}
 		}
 		return( colConfig );

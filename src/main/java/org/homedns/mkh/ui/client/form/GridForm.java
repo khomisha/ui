@@ -56,7 +56,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
 
 	private HandlerRegistryAdaptee handlers;
-	private State state = States.READONLY;
+	private State state = GridFormStates.READONLY;
 	private Transition transition;
 	private Command insertCmd, updateCmd;
 	private List< FieldInitValue > initValues;
@@ -90,8 +90,8 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	@Override
 	public void onSelectRow( SelectRowEvent event ) {
 		loadRecord( event.getRecord( ) );
-		if( getState( ) == States.NO_STATE ) {
-			changeStateTo( States.READONLY );
+		if( getState( ) == GridFormStates.NO_STATE ) {
+			changeStateTo( GridFormStates.READONLY );
 		}
 	}
 
@@ -121,14 +121,14 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 		int iSaveType = -1;
 		if( CONSTANTS.add( ).equals( button.getText( ) ) ) {
 			iSaveType = 0;
-			changeStateTo( States.ADD );
+			changeStateTo( GridFormStates.ADD );
 		}
 		if( CONSTANTS.update( ).equals( button.getText( ) ) ) {
 			iSaveType = 1;
-			changeStateTo( States.UPDATE );
+			changeStateTo( GridFormStates.UPDATE );
 		}
 		if( CONSTANTS.cancel( ).equals( button.getText( ) ) ) {
-			changeStateTo( States.READONLY );
+			changeStateTo( GridFormStates.READONLY );
 		}
 		if( iSaveType > -1 ) {
 			getButtons( ).get( CONSTANTS.save( ) ).setCommand( iSaveType == 0 ? insertCmd : updateCmd );
@@ -152,13 +152,13 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 		setResponse( response );
 		if( response instanceof InsertResponse || response instanceof UpdateResponse ) {
 			if( response.getResult( ) == Response.SAVE_SUCCESS ) {
-				changeStateTo( States.READONLY );
+				changeStateTo( GridFormStates.READONLY );
 			}			
 		}
 		if( response instanceof DeleteResponse ) {
 			if( response.getResult( ) == Response.SAVE_SUCCESS ) {
 				loadEmptyRecord( );
-				changeStateTo( States.NO_STATE );
+				changeStateTo( GridFormStates.NO_STATE );
 			}
 		}
 	}
@@ -247,7 +247,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 		public void onDataChanged( Store store ) {
 			super.onDataChanged( store );
 			if( store.getCount( ) < 1 ) {
-				changeStateTo( States.NO_STATE );				
+				changeStateTo( GridFormStates.NO_STATE );				
 			}
 		}		
 	}

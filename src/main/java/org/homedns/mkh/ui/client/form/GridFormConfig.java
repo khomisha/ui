@@ -48,7 +48,7 @@ public class GridFormConfig extends FormConfig {
 			new CmdTypeItem( CONSTANTS.cancel( ), NullCmd.class )
 		};
 		setAttribute( BUTTONS, items );
-		setAttribute( INIT_STATE, States.NO_STATE );
+		setAttribute( INIT_STATE, GridFormStates.NO_STATE );
 		setAttribute( TRANSITION, new GridFormTransition( ) );
 	}
 }

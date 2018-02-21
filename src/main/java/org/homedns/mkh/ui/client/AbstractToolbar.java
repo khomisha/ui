@@ -73,7 +73,7 @@ public abstract class AbstractToolbar extends Toolbar {
 	 * @param sStyle
 	 *            the style
 	 * @param attributes
-	 *            the attributes values array
+	 *            the attributes values array, e.g. attribute format "toggle=true"
 	 * 
 	 * @return the toolbar button
 	 */

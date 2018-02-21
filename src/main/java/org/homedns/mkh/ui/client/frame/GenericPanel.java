@@ -32,7 +32,7 @@ import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
-
+import com.gwtext.client.widgets.layout.CardLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +56,7 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	private Map< String, View > viewRegistry;
 	private Id parentId;
 	private String sParentPK;
+	private int iActiveItem;
 
 	public GenericPanel( ) {
 		registry = new HashMap< String, Panel >( );
@@ -428,5 +429,28 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button( sCaption );
 		btn.addClickHandler( new ButtonClickHandler( this, btn ) );
 		add( btn );
+	}
+
+	/**
+	 * @see com.gwtext.client.widgets.Container#setActiveItem(int)
+	 */
+	@Override
+	public void setActiveItem( int iActiveItem ) {
+		this.iActiveItem = iActiveItem;
+		super.setActiveItem( iActiveItem );
+	}
+
+	/**
+	 * @see com.gwtext.client.widgets.Container#getActiveItem()
+	 */
+	@Override
+	public int getActiveItem( ) {
+		int iItem;
+		if( getLayout( ) instanceof CardLayout ) {
+			iItem = iActiveItem;
+		} else {
+			iItem = super.getActiveItem( );
+		}
+		return( iItem );
 	}
 }

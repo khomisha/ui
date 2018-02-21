@@ -48,6 +48,7 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	private int iRefreshTimeout;
 	private String sVersion = "";
 	private String sBuildTime = "";
+	private PanelConfig panelCfg; 
 
 	public MainPanel( ) {
 		setLayout( new FitLayout( ) );
@@ -179,6 +180,25 @@ public abstract class MainPanel extends Panel implements NavigationHandler, Hand
 	 */
 	public void setRefreshTimeout( int iRefreshTimeout ) {
 		this.iRefreshTimeout = iRefreshTimeout;
+	}
+
+	/**
+	 * Returns panel configuration object.
+	 * The panel configuration defines general layout.
+	 * 
+	 * @return the panel configuration object
+	 */
+	public PanelConfig getPanelCfg( ) {
+		return( panelCfg );
+	}
+
+	/**
+	 * Sets panel configuration object.
+	 * 
+	 * @param panelCfg the panel configuration object to set
+	 */
+	public void setPanelCfg( PanelConfig panelCfg ) {
+		this.panelCfg = panelCfg;
 	}
 
 	/**

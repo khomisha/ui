@@ -159,4 +159,13 @@ public interface UIMessages extends com.google.gwt.i18n.client.Messages {
 	@DefaultMessage( "Version: {0}<br>Build: {1}<br>(c) {2}" )
 	@Key( "version" )
 	String version( String sVersion, String sBuildTime, String sCopyright );
+
+	/**
+	* Translated "Invalid pattern: {0}".
+	*
+	* @return translated "Invalid pattern: {0}"
+	*/
+	@DefaultMessage( "Invalid pattern: {0}" )
+	@Key( "invalidPattern" )
+	String invalidPattern( String sName );	
 }

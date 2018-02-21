@@ -35,6 +35,9 @@ public class GridFormTransition extends Transition {
 		TransitionCommand addCmd = new Transition2AddCommand( );
 		TransitionCommand updateCmd = new Transition2UpdateCommand( );
 		TransitionCommand nostateCmd = new Transition2NoStateCommand( );
+		// row indicates current state (titles NO_STATE, READONLY, ADD, UPDATE)
+		// column indicates new state (titles NO_STATE, READONLY, ADD, UPDATE)
+		// row/column intersection gives transition command which should be executed
 		TransitionCommand[][] transitionTable = new TransitionCommand[][] {
 			{ noCmd, roCmd, addCmd, updateCmd },
 			{ nostateCmd, noCmd, addCmd, updateCmd },

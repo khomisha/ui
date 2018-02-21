@@ -21,6 +21,7 @@ package org.homedns.mkh.ui.client.grid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.dataservice.shared.CUDRequest;
 import org.homedns.mkh.dataservice.shared.DeleteRequest;
@@ -96,9 +97,9 @@ public class EditorGridImpl extends GridImpl {
         	new GridCellListenerAdapter() {
         		public void onCellClick( GridPanel grid, int rowIndex, int colIndex, EventObject e ) {
         			if( e.getTarget( ".checkbox", 1 ) != null ) {
-        				Record record = grid.getStore( ).getAt( rowIndex );
-        				String sDataIndex = grid.getColumnModel( ).getDataIndex( colIndex );
-        				record.set( sDataIndex, !record.getAsBoolean( sDataIndex ) );
+        				setCellValue( 
+        					rowIndex, colIndex, !( Boolean )getCellValue( rowIndex, colIndex ) 
+        				);
         			}
         		}
         	}

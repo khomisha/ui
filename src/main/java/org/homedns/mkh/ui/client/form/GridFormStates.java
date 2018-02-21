@@ -21,10 +21,14 @@ package org.homedns.mkh.ui.client.form;
 import org.homedns.mkh.ui.client.State;
 
 /**
- * The available form states
+ * The available grid form states
+ * NO_STATE - no state, initial undefined state, 
+ * READONLY - the form in read-only state, 
+ * ADD - the from in add new record state, 
+ * UPDATE - the form in update existing record state 
  *
  */
-public enum States implements State {
+public enum GridFormStates implements State {
 	NO_STATE, READONLY, ADD, UPDATE;
 
 	/**

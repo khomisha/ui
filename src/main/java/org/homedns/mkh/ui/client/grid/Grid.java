@@ -291,6 +291,35 @@ public class Grid extends GridPanel implements Paging, HasButton {
 	}
 
 	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, int)
+	 */
+	public Object getCellValue( int iRow, int iCol ) {
+		return( impl.getCellValue( iRow, iCol ) );
+	}
+	
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, String)
+	 */
+	public Object getCellValue( int iRow, String sColName ) {
+		return( impl.getCellValue( iRow, sColName ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, int, Object)
+	 */
+	public void setCellValue( int iRow, int iCol, Object value ) {
+		impl.setCellValue( iRow, iCol, value );
+	}
+	
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, String, Object)
+	 * 
+	 */
+	public void setCellValue( int iRow, String sColName, Object value ) {
+		impl.setCellValue( iRow, sColName, value );
+	}
+
+	/**
 	 * Returns implementation object
 	 * 
 	 * @return the implementation object

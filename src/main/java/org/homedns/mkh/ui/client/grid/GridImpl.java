@@ -112,7 +112,6 @@ public class GridImpl extends AbstractGridImpl {
 					vtbar.addSeparator( );
 					vtbar.addButton( CONSTANTS.cacheFilter( ), null, new String[] { "toggle=true" } );				
 				}
-				vtbar.addFill( );
 				grid.setBottomToolbar( vtbar );
 			}
 		}
@@ -265,6 +264,68 @@ public class GridImpl extends AbstractGridImpl {
 		store.setSortInfo( new SortState( as[ 0 ], sd ) );
 	}
 	
+	/**
+	 * Returns specified cell value
+	 * 
+	 * @param iRow the cell row
+	 * @param iCol the cell column
+	 * 
+	 * @return the value
+	 */
+	protected Object getCellValue( int iRow, int iCol ) {
+		String sColName = getGrid( ).getColumnModel( ).getDataIndex( iCol );
+		return( getCellValue( iRow, sColName ) );
+	}
+	
+	/**
+	 * Returns specified cell value
+	 * 
+	 * @param iRow the cell row
+	 * @param sColName the cell column name
+	 * 
+	 * @return the value
+	 */
+	protected Object getCellValue( int iRow, String sColName ) {
+		Object value = null;
+		try {
+			WidgetStore store = ( WidgetStore )getCache( );
+			value = store.getFieldValue( sColName, store.getAt( iRow ) );
+		}
+		catch( Exception e ) {
+			LOG.warning( LOG.getName( ) + ": " + e.getMessage( ) );
+		}
+		return( value );
+	}
+
+	/**
+	 * Sets value for specified cell
+	 * 
+	 * @param iRow the cell row
+	 * @param iCol the cell column
+	 * @param value the value to set
+	 */
+	protected void setCellValue( int iRow, int iCol, Object value ) {
+		String sColName = getGrid( ).getColumnModel( ).getDataIndex( iCol );
+		setCellValue( iRow, sColName, value );
+	}
+	
+	/**
+	 * Sets value for specified cell
+	 * 
+	 * @param iRow the cell row
+	 * @param sColName the cell column name
+	 * @param value the value to set
+	 */
+	protected void setCellValue( int iRow, String sColName, Object value ) {
+		try {
+			WidgetStore store = ( WidgetStore )getCache( );
+			store.setFieldValue( store.getAt( iRow ), sColName, value );
+		}
+		catch( Exception e ) {
+			LOG.warning( LOG.getName( ) + ": " + e.getMessage( ) );
+		}		
+	}
+
 	/**
 	 * Returns true if grid paging is on and false otherwise 
 	 * 

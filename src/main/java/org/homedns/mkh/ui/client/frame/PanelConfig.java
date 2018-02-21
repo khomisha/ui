@@ -20,6 +20,8 @@ package org.homedns.mkh.ui.client.frame;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.layout.ContainerLayout;
 
 /**
@@ -104,5 +106,26 @@ public class PanelConfig {
 	 */
 	public void setChilds( List< ChildContainer > childs ) {
 		_childs = childs;
+	}
+	
+	/**
+	 * Returns specified child container panel 
+	 * 
+	 * @param iIndex the child container index
+	 * 
+	 * @return the the child container panel
+	 */
+	public Panel getPanel( int iIndex ) {
+		return( getChilds( ).get( iIndex ).getPanel( ) );
+	}
+	
+	/**
+	 * Sets panel for specified child container
+	 * 
+	 * @param iIndex the child container index
+	 * @param panel the panel to set
+	 */
+	public void setPanel( int iIndex, Panel panel ) {
+		getChilds( ).get( iIndex ).setPanel( panel );
 	}
 }

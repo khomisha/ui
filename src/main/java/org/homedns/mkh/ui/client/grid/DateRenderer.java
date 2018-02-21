@@ -32,7 +32,7 @@ import org.homedns.mkh.dataservice.client.DateFormatter;
  *
  */
 public class DateRenderer implements Renderer {
-	private DateTimeFormat _dateFormatter;
+	private DateTimeFormat dateFormatter;
 
 	/**
 	 * @param sStyle
@@ -40,11 +40,11 @@ public class DateRenderer implements Renderer {
 	 */
 	public DateRenderer( String sStyle ) {
 		if( sStyle.equals( Column.EDIT_DATE ) ) {
-			_dateFormatter = DateFormatter.DATE.getDateTimeFormat( );
+			dateFormatter = DateFormatter.DATE.getDateTimeFormat( );
 		} else if( sStyle.equals( Column.EDIT_TIME ) ) {
-			_dateFormatter = DateFormatter.TIME.getDateTimeFormat( );
+			dateFormatter = DateFormatter.TIME.getDateTimeFormat( );
 		} else if( sStyle.equals( Column.EDIT_TS ) ) {
-			_dateFormatter = DateFormatter.TIMESTAMP.getDateTimeFormat( );
+			dateFormatter = DateFormatter.TIMESTAMP.getDateTimeFormat( );
 		}
 	}
 
@@ -55,6 +55,6 @@ public class DateRenderer implements Renderer {
 	public String render(
 		Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store
 	) {
-		return( ( value != null ) ? _dateFormatter.format( ( Date )value ) : "" );
+		return( ( value != null ) ? dateFormatter.format( ( Date )value ) : "" );
 	}
 }

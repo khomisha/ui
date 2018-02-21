@@ -19,6 +19,7 @@
 package org.homedns.mkh.ui.client.grid;
 
 import java.util.List;
+
 import org.homedns.mkh.dataservice.client.Page;
 import org.homedns.mkh.dataservice.client.Paging;
 import org.homedns.mkh.dataservice.client.event.RegisterViewEvent;
@@ -33,6 +34,7 @@ import org.homedns.mkh.ui.client.HasButton;
 import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.Pager;
 import org.homedns.mkh.ui.client.cache.PagerStore;
+
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
@@ -352,6 +354,35 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	@Override
 	public void onButtonClick( Button button, EventObject e ) {
 		impl.onButtonClick( button, e );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, int)
+	 */
+	public Object getCellValue( int iRow, int iCol ) {
+		return( impl.getCellValue( iRow, iCol ) );
+	}
+	
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, String)
+	 */
+	public Object getCellValue( int iRow, String sColName ) {
+		return( impl.getCellValue( iRow, sColName ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, int, Object)
+	 */
+	public void setCellValue( int iRow, int iCol, Object value ) {
+		impl.setCellValue( iRow, iCol, value );
+	}
+	
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, String, Object)
+	 * 
+	 */
+	public void setCellValue( int iRow, String sColName, Object value ) {
+		impl.setCellValue( iRow, sColName, value );
 	}
 
 	/**
