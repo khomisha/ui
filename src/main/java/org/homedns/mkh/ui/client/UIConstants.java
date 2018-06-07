@@ -266,4 +266,13 @@ public interface UIConstants extends com.google.gwt.i18n.client.Constants {
 	@DefaultStringValue( "Name" )
 	@Key( "name" )
 	String name( );
+
+	/**
+	* Translated "Close".
+	*
+	* @return translated "Close"
+	*/
+	@DefaultStringValue( "Close" )
+	@Key( "close" )
+	String close( );
 }

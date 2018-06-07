@@ -39,12 +39,14 @@ import com.gwtext.client.data.Record.Operation;
 import com.gwtext.client.data.event.StoreListenerAdapter;
 import com.gwtext.client.widgets.form.Field;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
+import com.gwtext.client.widgets.grid.CellSelectionModel;
 import com.gwtext.client.widgets.grid.EditorGridPanel;
 import com.gwtext.client.widgets.grid.GridEditor;
 import com.gwtext.client.widgets.grid.GridPanel;
+import com.gwtext.client.widgets.grid.GridView;
+import com.gwtext.client.widgets.grid.event.CellSelectionModelListenerAdapter;
 import com.gwtext.client.widgets.grid.event.EditorGridListenerAdapter;
 import com.gwtext.client.widgets.grid.event.GridCellListenerAdapter;
-import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 
 /**
  * Implements editor grid functionality
@@ -90,7 +92,6 @@ public class EditorGridImpl extends GridImpl {
 				) {
 					return( !readonlyCols.contains( field ) );
 				}
-				
 			}
 		);
         grid.addGridCellListener(
@@ -104,15 +105,22 @@ public class EditorGridImpl extends GridImpl {
         		}
         	}
         );
-        grid.addGridRowListener( 
-        	new GridRowListenerAdapter( ) {
+        grid.getCellSelectionModel( ).addListener( 
+        	new CellSelectionModelListenerAdapter( ) {
 				@Override
-				public void onRowClick( GridPanel grid, int rowIndex, EventObject e ) {
-					setSelectedRow( rowIndex );
-					SelectRowEvent.fire( 
-						( ( View )grid ).getID( ), 
-						grid.getStore( ).getAt( rowIndex ) 
-					);
+				public void onCellSelect( CellSelectionModel sm, int rowIndex, int colIndex ) {
+					String sRecordId = grid.getStore( ).getAt( rowIndex ).getId( );
+					if( !sRecordId.equals( getSelectedRecordId( ) ) ) {
+						GridView gridView = grid.getView( );
+						if( gridView != null ) {
+							gridView.focusRow( rowIndex );
+						}
+						setSelectedRow( rowIndex );
+						SelectRowEvent.fire( 
+							( ( View )grid ).getID( ), 
+							grid.getStore( ).getAt( rowIndex ) 
+						);
+					}
 				}
         	}
         );

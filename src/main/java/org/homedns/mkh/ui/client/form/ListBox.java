@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Mikhail Khodonov
+ * Copyright 2013-2018 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -34,7 +34,7 @@ import com.gwtext.client.widgets.form.ComboBox;
 public class ListBox extends ComboBox {
 	private static final UIMessages MESSAGES = ( UIMessages )AbstractEntryPoint.getMessages( );
 	
-	private String sDisplayCol, sDataCol;
+	private String sDisplayCol, sDataCol, sNotFoundText;
 	
 	/**
 	 * @param col
@@ -60,7 +60,6 @@ public class ListBox extends ComboBox {
 		return( sDisplayCol );
 	}
 
-
 	/**
 	 * Returns the data column name
 	 * 
@@ -69,7 +68,25 @@ public class ListBox extends ComboBox {
 	public String getDataCol( ) {
 		return( sDataCol );
 	}
+	
+	/**
+	 * @see com.gwtext.client.widgets.form.ComboBox#setValueNotFoundText(java.lang.String)
+	 */
+	@Override
+	public void setValueNotFoundText( String sNotFoundText ) {
+		super.setValueNotFoundText( sNotFoundText );
+		this.sNotFoundText = sNotFoundText;
+	}
 
+	/**
+	 * Returns not found text
+	 * 
+	 * @return the not found text
+	 */
+	public String getValueNotFoundText( ) {
+		return( sNotFoundText );
+	}
+	
 	/**
 	 * Configures list box for specified column 
 	 * 

@@ -34,6 +34,7 @@ import org.homedns.mkh.ui.client.WidgetDesc;
 import org.homedns.mkh.ui.client.cache.Pager;
 import org.homedns.mkh.ui.client.cache.PagerStore;
 import org.homedns.mkh.ui.client.cache.RecordUtil;
+
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
@@ -317,6 +318,36 @@ public class Grid extends GridPanel implements Paging, HasButton {
 	 */
 	public void setCellValue( int iRow, String sColName, Object value ) {
 		impl.setCellValue( iRow, sColName, value );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isForcedRetrieve()
+	 */
+	@Override
+	public boolean isForcedRetrieve( ) {
+		return( impl.isForcedRetrieve( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setForcedRetrieve(boolean)
+	 */
+	@Override
+	public void setForcedRetrieve( boolean bForcedRetrieve ) {
+		impl.setForcedRetrieve( bForcedRetrieve );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getSelectedRow()
+	 */
+	public int getSelectedRow( ) {
+		return( impl.getSelectedRow( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setSelectedRow(int)
+	 */
+	public void setSelectedRow( int iSelectedRow ) {
+		impl.setSelectedRow( iSelectedRow );
 	}
 
 	/**

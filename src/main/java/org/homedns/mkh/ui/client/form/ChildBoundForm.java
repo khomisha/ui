@@ -156,9 +156,12 @@ public class ChildBoundForm extends BoundForm implements ChildView, SelectRowHan
 			if( response instanceof InsertResponse || response instanceof DeleteResponse ) {
 				reload( );
 			}
-//			if( response instanceof RetrieveResponse && isRendered( ) ) {
 			if( response instanceof RetrieveResponse ) {
-				reload( );				
+				if( ( ( RetrieveResponse )response ).isForcedRetrieve( ) ) {
+					setForcedRetrieve( true );
+					reload( );
+					setForcedRetrieve( false );
+				}
 			}
 		}
 	}

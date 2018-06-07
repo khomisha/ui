@@ -23,6 +23,7 @@ import org.homedns.mkh.dataservice.client.view.View;
 import org.homedns.mkh.ui.client.form.ChildBoundForm;
 import org.homedns.mkh.ui.client.grid.ChildEditorGrid;
 import org.homedns.mkh.ui.client.grid.ChildGrid;
+import org.homedns.mkh.ui.client.grid.EditorGrid;
 import org.homedns.mkh.ui.client.grid.Grid;
 
 /**
@@ -56,7 +57,12 @@ public abstract class GenericMasterChildPanel extends BorderLayoutPanel {
 	@Override
 	protected void init( ) {
 		super.init( );
-		View view = createView( Grid.class, getViewName( ), MAIN_PANEL );
+		View view = null;
+		if( getViewType( ) == Grid.class ) {
+			view = createView( Grid.class, getViewName( ), MAIN_PANEL );
+		} else if( getViewType( ) == EditorGrid.class ) {
+			view = createView( EditorGrid.class, getViewName( ), MAIN_PANEL );			
+		}
 		setParentId( view.getID( ) );
 	}
 

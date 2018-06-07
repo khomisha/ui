@@ -130,9 +130,28 @@ public class ChildEditorGrid extends EditorGrid implements ChildView, SelectRowH
 			if( response instanceof InsertResponse || response instanceof DeleteResponse ) {
 				reload( );
 			}
-			if( response instanceof RetrieveResponse && isRendered( ) ) {
-				reload( );				
+//			if( response instanceof RetrieveResponse && isRendered( ) ) {
+			if( response instanceof RetrieveResponse ) {
+				if( ( ( RetrieveResponse )response ).isForcedRetrieve( ) ) {
+					setForcedRetrieve( true );
+					reload( );
+					setForcedRetrieve( false );
+				}
 			}
 		}
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#getSelectedRow()
+	 */
+	public int getSelectedRow( ) {
+		return( getImplementation( ).getSelectedRow( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#setSelectedRow(int)
+	 */
+	public void setSelectedRow( int iSelectedRow ) {
+		getImplementation( ).setSelectedRow( iSelectedRow );
 	}
 }

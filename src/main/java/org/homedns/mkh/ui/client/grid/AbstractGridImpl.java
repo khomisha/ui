@@ -53,11 +53,12 @@ public abstract class AbstractGridImpl {
 
 	private GridConfig cfg;
 	private GridPanel grid;
-	private Data args;
 	private Command afterInitCmd, retrieveCmd;
 	private ViewCache cache;
 	private Response response;
 	private int iSelectedRow = 0;
+	private String sSelectedRecordId = "0";
+	private boolean bForcedRetrieve = false;
 	
 	/**
 	 * @param cfg
@@ -187,6 +188,16 @@ public abstract class AbstractGridImpl {
 	 */
 	protected void setSelectedRow( int iSelectedRow ) {
 		this.iSelectedRow = iSelectedRow;
+		this.sSelectedRecordId = grid.getStore( ).getAt( iSelectedRow ).getId( );
+	}
+
+	/**
+	 * Returns selected record id
+	 * 
+	 * @return the selected record id
+	 */
+	public String getSelectedRecordId( ) {
+		return( sSelectedRecordId );
 	}
 
 	/**
@@ -204,11 +215,10 @@ public abstract class AbstractGridImpl {
 	 * @see org.homedns.mkh.dataservice.client.view.View#onInit()
 	 */
 	protected Request onInit( ) {
-		retrieveCmd = CommandFactory.create( RetrieveCmd.class, grid );
-		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		RetrieveCmd rc = ( RetrieveCmd )CommandFactory.create( RetrieveCmd.class, grid );
+		retrieveCmd = rc;
 		setArgs( ( Data )cfg.getAttribute( GridConfig.ARGS ) );
-		request.setArgs( getArgs( ) );
-		return( request );
+		return( rc.getRequest( ) );
 	}
 	
 	/**
@@ -239,9 +249,24 @@ public abstract class AbstractGridImpl {
 	}
 	
 	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isForcedRetrieve()
+	 */
+	protected boolean isForcedRetrieve( ) {
+		return( bForcedRetrieve );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setForcedRetrieve(boolean)
+	 */
+	protected void setForcedRetrieve( boolean bForcedRetrieve ) {
+		this.bForcedRetrieve = bForcedRetrieve;
+	}
+
+	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#reload()
 	 */
 	protected void reload( ) {
+		LOG.config( ( ( View )grid ).getID( ).getName( ) + ": reload" );
 		retrieveCmd.execute( );
 	}
 	
@@ -257,14 +282,16 @@ public abstract class AbstractGridImpl {
 	 * @see org.homedns.mkh.dataservice.client.view.View#getArgs()
 	 */
 	protected Data getArgs( ) {
-		return( args );
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		return( request.getArgs( ) );
 	}
 
 	/**
 	 * @see org.homedns.mkh.dataservice.client.view.View#setArgs(org.homedns.mkh.dataservice.shared.Data)
 	 */
 	protected void setArgs( Data args ) {
-		this.args = args;
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		request.setArgs( args );
 	}
 
 	/**
@@ -295,7 +322,6 @@ public abstract class AbstractGridImpl {
 		if( request instanceof RetrieveRequest ) {
 			RetrieveRequest req = ( RetrieveRequest )request;
 			req.setCondition( getCondition( ) );
-			req.setArgs( getArgs( ) );			
 		}
 	}
 	
@@ -316,7 +342,9 @@ public abstract class AbstractGridImpl {
 	 */
 	protected void onButtonClick( Button button, EventObject e ) {
 		if( RELOAD_BTN_ICON_CLS.equals( button.getIconCls( ) ) ) {
+			setForcedRetrieve( true );
 			reload( );
+			setForcedRetrieve( false );
 		}
 	}
 }

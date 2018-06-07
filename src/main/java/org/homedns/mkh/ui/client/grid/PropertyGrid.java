@@ -311,6 +311,22 @@ public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	}
 
 	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isForcedRetrieve()
+	 */
+	@Override
+	public boolean isForcedRetrieve( ) {
+		return( impl.isForcedRetrieve( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setForcedRetrieve(boolean)
+	 */
+	@Override
+	public void setForcedRetrieve( boolean bForcedRetrieve ) {
+		impl.setForcedRetrieve( bForcedRetrieve );
+	}
+
+	/**
 	 * Returns implementation object
 	 * 
 	 * @return the implementation object

@@ -46,6 +46,7 @@ import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.event.PanelListenerAdapter;
 import com.gwtext.client.widgets.grid.GridPanel;
+import com.gwtext.client.widgets.grid.GridView;
 import com.gwtext.client.widgets.grid.RowSelectionModel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.grid.event.RowSelectionListenerAdapter;
@@ -131,6 +132,10 @@ public class GridImpl extends AbstractGridImpl {
 				public void onRowSelect( RowSelectionModel sm, int rowIndex, Record record ) {
 					LOG.config( ( ( View )grid ).getID( ).getName( ) + ": onRowSelect: selectRow(" + String.valueOf( rowIndex ) + ")" );
 					setSelectedRow( rowIndex );
+					GridView gridView = grid.getView( );
+					if( gridView != null ) {
+						gridView.focusRow( rowIndex );
+					}
 					SelectRowEvent.fire( ( ( View )grid ).getID( ), record );
 				}
 			}

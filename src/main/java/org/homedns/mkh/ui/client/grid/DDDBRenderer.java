@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Mikhail Khodonov
+ * Copyright 2013-2018 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,8 +18,6 @@
 
 package org.homedns.mkh.ui.client.grid;
 
-import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
-import org.homedns.mkh.ui.client.UIMessages;
 import org.homedns.mkh.ui.client.form.ListBox;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
@@ -27,12 +25,10 @@ import com.gwtext.client.widgets.grid.CellMetadata;
 import com.gwtext.client.widgets.grid.Renderer;
 
 /**
- * Dropdown data buffer or dropdown listbox renderer
+ * Renderer for dropdown data buffer or dropdown listbox 
  *
  */
 public class DDDBRenderer implements Renderer {
-	private static final UIMessages MESSAGES = ( UIMessages )AbstractEntryPoint.getMessages( );
-
 	private ListBox listBox;
 
 	/**
@@ -50,7 +46,7 @@ public class DDDBRenderer implements Renderer {
 	public String render( 
 		Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store 
 	) {
-		String sDisplay = MESSAGES.noValue( );
+		String sDisplay = listBox.getValueNotFoundText( );
 		Store lbStore = listBox.getStore( );
 		int iRow  = lbStore.findExact( listBox.getDataCol( ), String.valueOf( value ), 0 );
 		if( iRow > -1 ) {

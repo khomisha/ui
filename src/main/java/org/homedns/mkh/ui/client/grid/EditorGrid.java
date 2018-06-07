@@ -357,32 +357,46 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	}
 
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, int)
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#getCellValue(int, int)
 	 */
 	public Object getCellValue( int iRow, int iCol ) {
 		return( impl.getCellValue( iRow, iCol ) );
 	}
 	
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getCellValue(int, String)
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#getCellValue(int, String)
 	 */
 	public Object getCellValue( int iRow, String sColName ) {
 		return( impl.getCellValue( iRow, sColName ) );
 	}
 
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, int, Object)
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#setCellValue(int, int, Object)
 	 */
 	public void setCellValue( int iRow, int iCol, Object value ) {
 		impl.setCellValue( iRow, iCol, value );
 	}
 	
 	/**
-	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setCellValue(int, String, Object)
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#setCellValue(int, String, Object)
 	 * 
 	 */
 	public void setCellValue( int iRow, String sColName, Object value ) {
 		impl.setCellValue( iRow, sColName, value );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#getSelectedRow()
+	 */
+	public int getSelectedRow( ) {
+		return( impl.getSelectedRow( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.EditorGridImpl#setSelectedRow(int)
+	 */
+	public void setSelectedRow( int iSelectedRow ) {
+		impl.setSelectedRow( iSelectedRow );
 	}
 
 	/**
@@ -426,5 +440,21 @@ public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 		getAddedRecords( ).clear( );
 		getUpdatedRecords( ).clear( );
 		getRemovedRecords( ).clear( );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isForcedRetrieve()
+	 */
+	@Override
+	public boolean isForcedRetrieve( ) {
+		return( impl.isForcedRetrieve( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setForcedRetrieve(boolean)
+	 */
+	@Override
+	public void setForcedRetrieve( boolean bForcedRetrieve ) {
+		impl.setForcedRetrieve( bForcedRetrieve );
 	}
 }

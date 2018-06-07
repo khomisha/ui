@@ -50,9 +50,9 @@ public class ColumnConfigFactory {
 		} else {
 //			colConfig.setSortable( true );
 			colConfig.setHeader( col.getCaption( ) );
-			int iLimit = col.getLimit( );
-			if( iLimit != 0 ) {
-				colConfig.setWidth( iLimit );
+			int iWidth = col.getWidth( );
+			if( iWidth != 0 ) {
+				colConfig.setWidth( iWidth );
 			}
 			if( Column.CHECKBOX.equals( sStyle ) ) {
 				// shows checkbox in grid

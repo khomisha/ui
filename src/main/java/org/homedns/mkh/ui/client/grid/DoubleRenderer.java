@@ -50,7 +50,11 @@ public class DoubleRenderer implements Renderer {
 	public String render( 
 		Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store 
 	) {
-        return nf.format( ( ( Number )value ).doubleValue( ) );
+		if( value == null ) {
+			return( "" );
+		} else {
+			return nf.format( ( ( Number )value ).doubleValue( ) );
+		}
 	}
 	
 	/**

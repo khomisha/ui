@@ -32,7 +32,7 @@ import com.gwtext.client.widgets.event.ContainerListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
- * Single editable grid panel
+ * Single view panel
  *
  */
 @SuppressWarnings( "unchecked" )

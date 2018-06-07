@@ -188,9 +188,7 @@ public class BaseForm extends FormPanel {
 	 */
 	public void setDisabledFields( boolean bDisabled ) {
 		for( Field field : getFields( ) ) {
-			if( field.isVisible( ) ) {
-				field.setDisabled( bDisabled );
-			}
+			field.setDisabled( bDisabled );
 		}
 	}
 	
@@ -221,6 +219,15 @@ public class BaseForm extends FormPanel {
 			getForm( ).updateRecord( record	);
 		}
 		return( bResult );
+	}
+	
+	/**
+	 * Returns true if client-side validation on the form is successful.
+	 * 
+	 * @return true if validation is successful false otherwise
+	 */
+	public boolean isValid( ) {
+		return( getForm( ).isValid( ) );
 	}
 	
 	/**

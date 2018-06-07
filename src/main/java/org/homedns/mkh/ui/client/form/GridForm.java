@@ -18,8 +18,6 @@
 
 package org.homedns.mkh.ui.client.form;
 
-import java.util.List;
-
 import org.homedns.mkh.dataservice.client.AbstractEntryPoint;
 import org.homedns.mkh.dataservice.client.event.EventBus;
 import org.homedns.mkh.dataservice.client.event.HandlerRegistry;
@@ -39,11 +37,13 @@ import org.homedns.mkh.ui.client.command.InsertCmd;
 import org.homedns.mkh.ui.client.command.UpdateCmd;
 import org.homedns.mkh.ui.client.event.SelectRowEvent;
 import org.homedns.mkh.ui.client.event.SelectRowEvent.SelectRowHandler;
+
 import com.google.gwt.user.client.Command;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
+import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.Container;
 import com.gwtext.client.widgets.form.event.FormPanelListenerAdapter;
 
@@ -59,7 +59,6 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	private State state = GridFormStates.READONLY;
 	private Transition transition;
 	private Command insertCmd, updateCmd;
-	private List< FieldInitValue > initValues;
 
 	/**
 	 * {@link org.homedns.mkh.ui.client.form.BoundForm}
@@ -82,6 +81,21 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 		GridFormConfig cfg = ( GridFormConfig )getFormConfig( );
 		transition = ( Transition )cfg.getAttribute( GridFormConfig.TRANSITION );
 		changeStateTo( ( State )cfg.getAttribute( GridFormConfig.INIT_STATE ) );
+		addListener(
+			new FormPanelListenerAdapter( ) {
+				@Override
+				public void onAfterLayout( Container self ) {
+					refresh( );
+				}
+				@Override
+				public void onRender( Component component ) {
+					Record record = getCurrentRecord( );
+					if( record != null ) {
+						getForm( ).loadRecord( record );
+					}
+				}
+			}
+		);
 	}
 
 	/**
@@ -103,14 +117,6 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 		super.init( desc );
 		insertCmd = CommandFactory.create( InsertCmd.class, this );
 		updateCmd = CommandFactory.create( UpdateCmd.class, this );
-		addListener(
-			new FormPanelListenerAdapter( ) {
-				@Override
-				public void onAfterLayout( Container self ) {
-					refresh( );
-				}
-			}
-		);
 	}
 	
 	/**
@@ -134,7 +140,7 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 			getButtons( ).get( CONSTANTS.save( ) ).setCommand( iSaveType == 0 ? insertCmd : updateCmd );
 		}
 		if( CONSTANTS.save( ).equals( button.getText( ) ) ) {
-			if( !getForm( ).isValid( ) ) {
+			if( !isValid( ) ) {
 				return;
 			}
 		}
@@ -201,35 +207,6 @@ public class GridForm extends BoundForm implements SelectRowHandler, HasState, H
 	@Override
 	public void changeStateTo( State newState ) {
 		transition.doTransition( newState, this );
-	}
-	
-	/**
-	 * Sets initial values
-	 * 
-	 * @param initValues the initial values
-	 */
-	public void setInitValues( List< FieldInitValue > initValues ) {
-		this.initValues = initValues;
-	}
-	
-	/**
-	 * Returns initial values
-	 * 
-	 * @return the initial values
-	 */
-	public List< FieldInitValue > getInitValues( ) {
-		return( initValues );
-	}
-
-	/**
-	 * Sets initials values (if exist) for form fields
-	 */
-	public void initValues( ) {
-		if( initValues != null && !initValues.isEmpty( ) ) {
-			for( FieldInitValue value : initValues ) {
-				value.setInitValue( );
-			}
-		}
 	}
 	
 	protected class GridFormCacheListener extends CacheListener {

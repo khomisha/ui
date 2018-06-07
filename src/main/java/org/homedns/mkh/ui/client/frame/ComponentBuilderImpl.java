@@ -74,7 +74,7 @@ public class ComponentBuilderImpl implements ComponentBuilder {
 	@Override
 	public View getComponent( Class< ? > type, Id id ) {
 		View c = null;
-		if( type == org.homedns.mkh.ui.client.grid.Grid.class ) {
+		if( type == Grid.class ) {
 			c = getGrid( id );
 		} else if( type == EditorGrid.class ) {
 			c = getEditorGrid( id );			

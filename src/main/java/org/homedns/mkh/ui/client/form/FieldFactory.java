@@ -20,7 +20,6 @@ package org.homedns.mkh.ui.client.form;
 
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.Type;
-
 import com.gwtext.client.widgets.form.Checkbox;
 import com.gwtext.client.widgets.form.DateField;
 import com.gwtext.client.widgets.form.Field;
@@ -54,6 +53,7 @@ public class FieldFactory {
 		String sStyle = col.getStyle( );
 		String sRule = col.getValidationRule( );
 		String sMsg = col.getValidationMsg( );
+		String sPattern = col.getPattern( );
 		if( Column.DDDB.equals( sStyle ) || Column.DDLB.equals( sStyle ) ) {
 			newField = new ListBox( col, FIELD_WIDTH );
 		} else if( Column.CHECKBOX.equals( sStyle ) ) {
@@ -81,7 +81,7 @@ public class FieldFactory {
 		} else if( Column.EDIT.equals( sStyle ) ) {
 			Type type = col.getColType( );
 			if( type == Type.STRING ) {
-				if( col.getLimit( ) == 0 ) {
+				if( col.getWidth( ) == 0 ) {
 					newField = configTextArea( new TextArea( sCaption, sColName ), sRule, sMsg );
 				} else {
 					newField = new TextField( sCaption, sColName, FIELD_WIDTH );
@@ -94,24 +94,23 @@ public class FieldFactory {
 				type == Type.BYTE
 			) {
 				newField = configNumberField( 
-					new NumberField( sCaption, sColName, FIELD_WIDTH ), false, sRule, sMsg 
+					new NumberField( sCaption, sColName, FIELD_WIDTH ), "", false, sRule, sMsg 
 				);
 			} else if( type == Type.FLOAT || type == Type.DOUBLE ) {
 				newField = configNumberField( 
-					new NumberField( sCaption, sColName, FIELD_WIDTH ), true, sRule, sMsg 
+					new NumberField( sCaption, sColName, FIELD_WIDTH ), sPattern, true, sRule, sMsg 
 				);
 			} 
 		} else {
 			throw new IllegalArgumentException( "style: " + sStyle );			
 		}
 		if( newField != null ) {
+			newField.setValidationEvent( false );
 			if( newField instanceof TextField ) {
 				TextField textField = ( TextField )newField;
 				textField.setAllowBlank( !col.isRequired( ) );
 				textField.setSelectOnFocus( true );
 			}
-			newField.setValidateOnBlur( false );
-			newField.setValidationEvent( false );
 		}
 		return( newField );
 	}
@@ -136,15 +135,23 @@ public class FieldFactory {
 	* Configures number field
 	*
 	* @param field to configure
+	* @param sPattern the field pattern
 	* @param bIsDecimal decimal number flag
 	* @param sRule validation rule
 	* @param sMsg validation message
 	* 
 	* @return the configured field
 	*/
-	private static Field configNumberField( NumberField field, boolean bIsDecimal, String sRule, String sMsg ) {
+	private static Field configNumberField( 
+		NumberField field, String sPattern, boolean bIsDecimal, String sRule, String sMsg 
+	) {
 		setValidation( field, sRule, sMsg );
 		field.setAllowDecimals( bIsDecimal );
+		if( bIsDecimal && !"".equals( sPattern ) ) {
+			String[] as = sPattern.split( "\\." );
+			int iPrecision = as.length == 1 ? 0 : as[ 1 ].length( );
+			field.setDecimalPrecision( iPrecision );
+		}
 		return( field );
 	}
 
@@ -170,13 +177,16 @@ public class FieldFactory {
 	* @param sRule validation rule
 	* @param sMsg validation message
 	*/
-	private static void setValidation( TextField field, String sRule, String sMsg ) {
+	public static void setValidation( TextField field, String sRule, String sMsg ) {
 		if( !"".equals( sRule ) ) {
 			field.setRegex( sRule );
-			if( !"".equals( sMsg ) ) {
-				field.setRegexText( sMsg );
-			}
+			field.setRegexText( sMsg );
+		}
+		if( !"".equals( sMsg ) ) {
+			field.setBlankText( sMsg );
+			field.setInvalidText( sMsg );
+			field.setMaxLengthText( sMsg );
+			field.setMinLengthText( sMsg );
 		}
 	}
-	
 }

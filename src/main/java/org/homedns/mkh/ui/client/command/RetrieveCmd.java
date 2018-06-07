@@ -43,6 +43,7 @@ public class RetrieveCmd extends GenericCommand< View > {
 	public void execute( ) {
 		RetrieveRequest request = ( RetrieveRequest )getRequest( );
 		request.setID( getParam( ).getID( ) );
+		request.setForcedRetrieve( getParam( ).isForcedRetrieve( ) );
 		RequestSender sender = SendBinder.bind( request );
 		sender.setView( getParam( ) );
 		sender.send( );

@@ -138,8 +138,26 @@ public class ChildGrid extends Grid implements ChildView, SelectRowHandler, RPCR
 			}
 //			if( response instanceof RetrieveResponse && isRendered( ) ) {
 			if( response instanceof RetrieveResponse ) {
-				reload( );				
+				if( ( ( RetrieveResponse )response ).isForcedRetrieve( ) ) {
+					setForcedRetrieve( true );
+					reload( );
+					setForcedRetrieve( false );
+				}
 			}
 		}
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#getSelectedRow()
+	 */
+	public int getSelectedRow( ) {
+		return( getImplementation( ).getSelectedRow( ) );
+	}
+
+	/**
+	 * @see org.homedns.mkh.ui.client.grid.GridImpl#setSelectedRow(int)
+	 */
+	public void setSelectedRow( int iSelectedRow ) {
+		getImplementation( ).setSelectedRow( iSelectedRow );
 	}
 }

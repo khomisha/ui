@@ -168,4 +168,13 @@ public interface UIMessages extends com.google.gwt.i18n.client.Messages {
 	@DefaultMessage( "Invalid pattern: {0}" )
 	@Key( "invalidPattern" )
 	String invalidPattern( String sName );	
+
+	/**
+	* Translated "This field is required".
+	*
+	* @return translated "This field is required"
+	*/
+	@DefaultMessage( "This field is required" )
+	@Key( "blankText" )
+	String blankText( );	
 }

@@ -23,6 +23,7 @@ import org.homedns.mkh.ui.client.form.ChildBoundForm;
 import org.homedns.mkh.ui.client.grid.ChildEditorGrid;
 import org.homedns.mkh.ui.client.grid.ChildGrid;
 import org.homedns.mkh.ui.client.grid.EditorGrid;
+import org.homedns.mkh.ui.client.grid.Grid;
 import org.homedns.mkh.ui.client.grid.PropertyGrid;
 
 /**
@@ -90,12 +91,8 @@ public class ViewsPanel extends BorderLayoutPanel {
 	 * @param sPanelName the wrapped panel name
 	 */
 	private void createView( ViewTag tag, String sPanelName ) {
-		if( tag.getType( ) == org.homedns.mkh.ui.client.grid.Grid.class ) {
-			createView( 
-				org.homedns.mkh.ui.client.grid.Grid.class, 
-				tag.getName( ), 
-				sPanelName 
-			);
+		if( tag.getType( ) == Grid.class ) {
+			createView( Grid.class, tag.getName( ), sPanelName );
 		} else if( tag.getType( ) == EditorGrid.class ) {
 			createView( EditorGrid.class, tag.getName( ), sPanelName );
 		} else if( tag.getType( ) == PropertyGrid.class ) {

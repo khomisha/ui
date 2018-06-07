@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Mikhail Khodonov
+ * Copyright 2016-2018 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -26,12 +26,17 @@ import org.homedns.mkh.ui.client.ButtonClickHandler;
 import org.homedns.mkh.ui.client.Config;
 import org.homedns.mkh.ui.client.HasButton;
 import org.homedns.mkh.ui.client.HasGWTButton;
-
+import org.homedns.mkh.ui.client.command.CommandFactory;
+import org.homedns.mkh.ui.client.command.ShowDialogCmd;
+import org.homedns.mkh.ui.client.form.FormConfig;
+import org.homedns.mkh.ui.client.grid.Grid;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.Command;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.data.Record;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.grid.event.GridListenerAdapter;
 import com.gwtext.client.widgets.layout.CardLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +56,7 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	private Access access;
 	private ComponentBuilder builder;
 	private String sViewName;
+	private Class< ? > viewType = Grid.class;
 	private Map< String, Panel > registry;
 	private List< ViewTag > tagList;
 	private Map< String, View > viewRegistry;
@@ -181,6 +187,24 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	public void setViewName( String sViewName ) {
 		this.sViewName = sViewName;
 	}
+	
+	/**
+	 * Sets view class type 
+	 * 
+	 * @param viewType the view class type to set
+	 */
+	public void setViewType( Class< ? extends View > viewType ) {
+		this.viewType = viewType;
+	}
+
+	/**
+	 * Returns view class type
+	 * 
+	 * @return the view class type
+	 */
+	public Class< ? > getViewType( ) {
+		return( viewType );
+	}
 
 	/**
 	 * Returns views tags list
@@ -208,7 +232,7 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	 * @param type
 	 *            the tag class type
 	 */
-	public void addViewTag( String sName, Class< ? > type ) {
+	public void addViewTag( String sName, Class< ? extends View > type ) {
 		tagList.add( new ViewTag( sName, type ) );
 	}
 
@@ -452,5 +476,51 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 			iItem = super.getActiveItem( );
 		}
 		return( iItem );
+	}
+
+	/**
+	 * Returns selected record in specified grid, applied for 
+	 * @see org.homedns.mkh.ui.client.grid.Grid
+	 * 
+	 * @param sGridName
+	 *            the grid name
+	 * 
+	 * @return the selected record or null
+	 */
+	public Record getSelected( String sGridName ) {
+		Grid grid = ( Grid )getView( sGridName + Grid.class.getName( ) );
+		Record record = null;
+		if( grid != null ) {
+			record = grid.getSelectionModel( ).getSelected( );
+		}
+		return( record );
+	}
+	
+	/**
+	 * Sets single field view/edit dialog for specified grid
+	 * 
+	 * @param grid
+	 *            the source grid
+	 * @param sFieldName
+	 *            the field name
+	 * @param bEdit
+	 *            the edit flag, if true the field value can be edit and save,
+	 *            false read only
+	 */
+	public void setSingleFieldEditDlg( Grid grid, String sFieldName, boolean bEdit ) {
+		BaseDialog dlg = new BaseDialog( 
+			grid.getDescription( ).getDataBufferDesc( ).getColumn( sFieldName ).getCaption( ), 
+			new EditFieldForm( grid, sFieldName, new FormConfig( ), bEdit ) 
+		);
+		final Command openDlgCmd = CommandFactory.create( ShowDialogCmd.class, dlg );
+		grid.addGridListener( 
+			new GridListenerAdapter( ) {
+				@Override
+				public void onDblClick( EventObject e ) {
+					super.onDblClick( e );
+					openDlgCmd.execute( );
+				}
+			}
+		);		
 	}
 }

@@ -1,5 +1,5 @@
 /*
-* Copyright 2013-2014 Mikhail Khodonov
+* Copyright 2013-2018 Mikhail Khodonov
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); you may not
 * use this file except in compliance with the License. You may obtain a copy of
@@ -19,9 +19,11 @@
 package org.homedns.mkh.ui.client.form;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-
 import org.homedns.mkh.dataservice.client.Column;
 import org.homedns.mkh.dataservice.client.event.RegisterViewEvent;
 import org.homedns.mkh.dataservice.client.view.View;
@@ -44,11 +46,13 @@ import com.gwtext.client.data.Record;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.event.StoreListener;
 import com.gwtext.client.data.event.StoreListenerAdapter;
+import com.gwtext.client.util.DateUtil;
+import com.gwtext.client.util.JavaScriptObjectHelper;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.form.DateField;
 import com.gwtext.client.widgets.form.Field;
 import com.gwtext.client.widgets.layout.AnchorLayoutData;
 import com.gwtext.client.widgets.layout.FormLayout;
-
 import org.homedns.mkh.ui.client.CmdTypeItem;
 
 /**
@@ -62,12 +66,13 @@ public class BoundForm extends BaseForm implements View {
 	private Id id;
 	private WidgetDesc desc;
 	private Record currentRecord;
-	private Data args;
 	private Class< ? > cacheType = WidgetStore.class;
 	private Response response;
 	private boolean bBatch = false;
 	private StoreListener storeListener;
 	private Command retrieveCmd;
+	private boolean bForcedRetrieve = false;
+	private Map< String, String > initValues;
 
 	/**
 	 * @param id
@@ -95,6 +100,13 @@ public class BoundForm extends BaseForm implements View {
 		int iDelay = ( Integer )cfg.getAttribute( FormConfig.SCHEDULE_RETRIEVE_CMD );
 		if( iDelay > 0 ) {
 			CommandScheduler.get( ).addCmd2Schedule( retrieveCmd, iDelay );
+		}
+		setInitValues( ( Map< String, String > )cfg.getAttribute( FormConfig.INIT_VALUES ) );
+		if( initValues == null ) {
+			setDefaultInitValues( );
+		}
+		if( ( Boolean )cfg.getAttribute( FormConfig.READONLY ) ) {
+			setDisabledFields( true );
 		}
 	}
 
@@ -296,17 +308,16 @@ public class BoundForm extends BaseForm implements View {
 	}
 
 	/**
-	 * Default implementation sets retrieval arguments and filtering condition
+	 * Default implementation sets retrieval arguments and filtering condition (if necessary)
 	 * 
 	 * @see org.homedns.mkh.dataservice.client.view.View#onInit()
 	 */
 	@Override
 	public Request onInit( ) {
-		retrieveCmd = CommandFactory.create( RetrieveCmd.class, this );
-		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		RetrieveCmd rc = ( RetrieveCmd )CommandFactory.create( RetrieveCmd.class, this );
+		retrieveCmd = rc;
 		setArgs( ( Data )getFormConfig( ).getAttribute( FormConfig.ARGS ) );
-		request.setArgs( getArgs( ) );
-		return( request );
+		return( rc.getRequest( ) );
 	}
 
 	/**
@@ -375,7 +386,8 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public Data getArgs( ) {
-		return( args );
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		return( request.getArgs( ) );
 	}
 
 	/**
@@ -383,7 +395,8 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	@Override
 	public void setArgs( Data args ) {
-		this.args = args;
+		RetrieveRequest request = ( RetrieveRequest )( ( RetrieveCmd )retrieveCmd ).getRequest( );
+		request.setArgs( args );
 	}
 
 	/**
@@ -443,6 +456,22 @@ public class BoundForm extends BaseForm implements View {
 	}
 
 	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#isForcedRetrieve()
+	 */
+	@Override
+	public boolean isForcedRetrieve( ) {
+		return( bForcedRetrieve );
+	}
+
+	/**
+	 * @see org.homedns.mkh.dataservice.client.view.View#setForcedRetrieve(boolean)
+	 */
+	@Override
+	public void setForcedRetrieve( boolean bForcedRetrieve ) {
+		this.bForcedRetrieve = bForcedRetrieve;
+	}
+
+	/**
 	 * Returns store listener object 
 	 * 
 	 * @return the store listener object
@@ -458,6 +487,51 @@ public class BoundForm extends BaseForm implements View {
 	 */
 	public void setStoreListener( StoreListener storeListener ) {
 		this.storeListener = storeListener;
+	}
+	
+	/**
+	 * Sets initial values
+	 * 
+	 * @param initValues the initial values
+	 */
+	public void setInitValues( Map< String, String > initValues ) {
+		this.initValues = initValues;
+	}
+	
+	/**
+	 * Returns initial values
+	 * 
+	 * @return the initial values
+	 */
+	public Map< String, String > getInitValues( ) {
+		return( initValues );
+	}
+
+	/**
+	 * Sets initials values (if exist) for form fields
+	 */
+	public void initValues( ) {
+		for( Field field : getFields( ) ) {
+			String sValue = initValues.get( field.getName( ) );
+			if( sValue != null ) {
+				field.setValue( sValue );					
+			}
+			field.clearInvalid( );
+		}
+	}
+	
+	/**
+	 * Sets default initial fields values
+	 */
+	private void setDefaultInitValues( ) {
+		initValues = new HashMap< String, String >( );
+		for( Field field : getFields( ) ) { 
+			if( field instanceof DateField ) {
+				DateField df = ( DateField )field;
+				String fmt = JavaScriptObjectHelper.getAttribute( df.getJsObj( ), "format" );
+				initValues.put( field.getName( ), DateUtil.format( new Date( ), fmt ) );
+			}
+		}		
 	}
 	
 	protected class CacheListener extends StoreListenerAdapter {

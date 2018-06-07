@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Mikhail Khodonov
+ * Copyright 2013-2018 Mikhail Khodonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -44,11 +44,11 @@ import com.gwtext.client.widgets.grid.RowNumberingColumnConfig;
  *
  */
 public class WidgetDesc implements ViewDesc {
-	private DataBufferDesc _desc;
-	private Field[] _fields;
-	private BaseColumnConfig[] _colConfigs;
-	private FieldDef[] _fieldDefs;
-	private Map< Column, Field > _col2Field = new HashMap< Column, Field >( );
+	private DataBufferDesc desc;
+	private Field[] fields;
+	private BaseColumnConfig[] colConfigs;
+	private FieldDef[] fieldDefs;
+	private Map< Column, Field > col2Field = new HashMap< Column, Field >( );
 	
 	public WidgetDesc( ) {
 	}
@@ -58,7 +58,7 @@ public class WidgetDesc implements ViewDesc {
 	 */
 	@Override
 	public DataBufferDesc getDataBufferDesc( ) {
-		return( _desc );
+		return( desc );
 	}
 
 	/**
@@ -67,16 +67,26 @@ public class WidgetDesc implements ViewDesc {
 	 * @return the fields
 	 */
 	public Field[] getFields( ) {
-		return( _fields );
+		return( fields );
 	}
 
+	/**
+	 * Returns field by specified name
+	 * 
+	 * @param sName the field name
+	 * 
+	 * @return the field
+	 */
+	public Field getField( String sName ) {
+		return( col2Field.get( desc.getColumn( sName ) ) );
+	}
 	/**
 	 * Returns columns configurations
 	 * 
 	 * @return the columns configurations
 	 */
 	public BaseColumnConfig[] getColConfigs( ) {
-		return( _colConfigs );
+		return( colConfigs );
 	}
 
 	/**
@@ -85,7 +95,7 @@ public class WidgetDesc implements ViewDesc {
 	 * @return the fields definitions
 	 */
 	public FieldDef[] getFieldDefs( ) {
-		return( _fieldDefs );
+		return( fieldDefs );
 	}
 	
 	/**
@@ -94,7 +104,7 @@ public class WidgetDesc implements ViewDesc {
 	 * @return the column to field map
 	 */
 	public Map< Column, Field > getCol2Field( ) {
-		return( _col2Field );
+		return( col2Field );
 	}
 	
 	/**
@@ -112,7 +122,7 @@ public class WidgetDesc implements ViewDesc {
 	 * {@link org.homedns.mkh.dataservice.client.DataBufferDesc#getColIndex(String)}
 	 */
 	public int getColIndex( String sColName ) {
-		return( _desc.getColIndex( sColName ) );
+		return( desc.getColIndex( sColName ) );
 	}
 
 	/**
@@ -145,7 +155,7 @@ public class WidgetDesc implements ViewDesc {
 	 */
 	@Override
 	public void setDataBufferDesc( DataBufferDesc desc ) {
-		_desc = desc;
+		this.desc = desc;
 		init( );
 	}
 	
@@ -157,17 +167,17 @@ public class WidgetDesc implements ViewDesc {
 		List< BaseColumnConfig > colConfigs = new ArrayList< BaseColumnConfig >( );
 		List< FieldDef > fieldDefs = new ArrayList< FieldDef >( );
 		colConfigs.add( new RowNumberingColumnConfig( ) );
-		for( Column col : _desc.getColumns( ) ) {
+		for( Column col : desc.getColumns( ) ) {
 			Field field = FieldFactory.create( col );
 			if( field != null ) {
 				fields.add( field );
-				_col2Field.put( col, field );
+				col2Field.put( col, field );
 			}
 			colConfigs.add( ColumnConfigFactory.create( col, field ) );
 			fieldDefs.add( FieldDefFactory.create( col ) );
 		}
-		_fields = fields.toArray( new Field[ fields.size( ) ] );
-		_colConfigs = colConfigs.toArray( new BaseColumnConfig[ colConfigs.size( ) ] );
-		_fieldDefs = fieldDefs.toArray( new FieldDef[ fieldDefs.size( ) ] );		
+		this.fields = fields.toArray( new Field[ fields.size( ) ] );
+		this.colConfigs = colConfigs.toArray( new BaseColumnConfig[ colConfigs.size( ) ] );
+		this.fieldDefs = fieldDefs.toArray( new FieldDef[ fieldDefs.size( ) ] );		
 	}
 }

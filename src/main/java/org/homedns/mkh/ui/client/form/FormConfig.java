@@ -73,6 +73,14 @@ public class FormConfig extends WidgetConfig {
 	* Label align, default right
 	*/
 	public static final Integer LABEL_ALIGN = 109;
+	/**
+	* Fields init values
+	*/
+	public static final Integer INIT_VALUES = 110;
+	/**
+	* Form readonly flag, default is false
+	*/
+	public static final Integer READONLY = 111;
 
 	/**
 	 * default configuration settings
@@ -90,6 +98,8 @@ public class FormConfig extends WidgetConfig {
 		setAttribute( BUTTON_ALIGN, Position.RIGHT );
 		setAttribute( LABEL_ALIGN, Position.RIGHT );
 		setAttribute( AUTO_SCROLL, false );
+		setAttribute( INIT_VALUES, null );
+		setAttribute( READONLY, false );
 		setAttribute( 
 			BUTTONS, 
 			new CmdTypeItem[] { 
