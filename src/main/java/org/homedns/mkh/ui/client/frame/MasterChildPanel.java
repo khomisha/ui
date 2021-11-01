@@ -23,7 +23,6 @@ import org.homedns.mkh.dataservice.client.view.View;
 /**
  * Master/child panel
  */
-@SuppressWarnings( "unchecked" )
 public class MasterChildPanel extends GenericMasterChildPanel {
 
 	/**

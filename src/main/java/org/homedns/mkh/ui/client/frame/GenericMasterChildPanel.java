@@ -30,7 +30,6 @@ import org.homedns.mkh.ui.client.grid.Grid;
  * Abstract master child panel
  *
  */
-@SuppressWarnings( "unchecked" )
 public abstract class GenericMasterChildPanel extends BorderLayoutPanel {
 
 	public GenericMasterChildPanel( ) {
@@ -55,7 +54,7 @@ public abstract class GenericMasterChildPanel extends BorderLayoutPanel {
 	 * @see org.homedns.mkh.ui.client.frame.BorderLayoutPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		super.init( );
 		View view = null;
 		if( getViewType( ) == Grid.class ) {

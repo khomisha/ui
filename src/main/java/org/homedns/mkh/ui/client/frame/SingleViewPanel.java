@@ -35,7 +35,6 @@ import com.gwtext.client.widgets.layout.FitLayout;
  * Single view panel
  *
  */
-@SuppressWarnings( "unchecked" )
 public class SingleViewPanel extends GenericPanel {
 
 	public SingleViewPanel( ) {
@@ -72,7 +71,7 @@ public class SingleViewPanel extends GenericPanel {
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		putPanel( "main", this );
 		ViewTag tag = getViewTag( ).get( 0 );
 		if( getParentId( ) == null ) {

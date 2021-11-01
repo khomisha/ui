@@ -29,7 +29,6 @@ import com.gwtext.client.widgets.layout.FitLayout;
 /**
 * Container with accordion layout contains list panel and edit panel
 */
-@SuppressWarnings( "unchecked" )
 public class AccordionPanel extends GenericPanel {
 	private int iCompletedCount = 0;
 
@@ -46,7 +45,7 @@ public class AccordionPanel extends GenericPanel {
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		Panel listPanel = new Panel( );
 		listPanel.setBorder( false );
 		listPanel.setLayout( new FitLayout( ) );

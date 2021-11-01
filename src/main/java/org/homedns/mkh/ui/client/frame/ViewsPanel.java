@@ -52,7 +52,7 @@ public class ViewsPanel extends BorderLayoutPanel {
 	 * @see org.homedns.mkh.ui.client.frame.BorderLayoutPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		super.init( );
 		int iCount = 0;
 		for( ViewTag tag : getViewTag( ) ) {

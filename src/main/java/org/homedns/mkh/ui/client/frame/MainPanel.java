@@ -39,7 +39,6 @@ import com.gwtext.client.widgets.layout.FitLayout;
  * The application top level panel
  *
  */
-@SuppressWarnings( "unchecked" )
 public abstract class MainPanel extends Panel implements NavigationHandler, HandlerRegistry {
 	private BasePanel currentPanel;
 	private HandlerRegistryAdaptee handlers;

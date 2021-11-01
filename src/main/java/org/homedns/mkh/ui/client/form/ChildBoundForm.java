@@ -45,7 +45,6 @@ import com.gwtext.client.data.Record;
  * Child bound form, depends on master grid
  * 
  */
-@SuppressWarnings( "unchecked" )
 public class ChildBoundForm extends BoundForm implements ChildView, SelectRowHandler, RPCResponseHandler, HandlerRegistry  {
 	private static final Logger LOG = Logger.getLogger( ChildBoundForm.class.getName( ) );  
 

@@ -29,7 +29,6 @@ import com.gwtext.client.widgets.Panel;
 * Base panel, all panels are used as navigation subject must extend base panel
 * @see org.homedns.mkh.ui.client.frame.MainPanel
 */
-@SuppressWarnings( "unchecked" )
 public abstract class BasePanel extends Panel {
 	private Token _token;
 	

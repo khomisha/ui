@@ -28,7 +28,6 @@ import com.gwtext.client.widgets.event.PanelListenerAdapter;
 /**
 * TabPanel container with view access management.
 */
-@SuppressWarnings( "unchecked" )
 public class TabsPanel extends TabPanel implements ViewAccess {
 	private Access access;
 	private String sTag;

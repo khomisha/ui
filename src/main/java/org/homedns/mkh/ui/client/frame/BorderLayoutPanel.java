@@ -28,7 +28,6 @@ import com.gwtext.client.widgets.layout.FitLayout;
 /**
 * Container with border layout contains main panel and child panel
 */
-@SuppressWarnings( "unchecked" )
 public class BorderLayoutPanel extends GenericPanel {
 	public static final String MAIN_PANEL = "main";
 	public static final String CHILD_PANEL = "child";
@@ -132,7 +131,7 @@ public class BorderLayoutPanel extends GenericPanel {
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		Panel mainPanel = new Panel( );
 		mainPanel.setLayout( new FitLayout( ) );
 		mainPanel.setBorder( false );

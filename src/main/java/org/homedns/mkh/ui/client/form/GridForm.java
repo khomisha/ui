@@ -51,7 +51,6 @@ import com.gwtext.client.widgets.form.event.FormPanelListenerAdapter;
  * Form for view/edit grid records
  *
  */
-@SuppressWarnings( "unchecked" )
 public class GridForm extends BoundForm implements SelectRowHandler, HasState, HandlerRegistry {
 	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
 

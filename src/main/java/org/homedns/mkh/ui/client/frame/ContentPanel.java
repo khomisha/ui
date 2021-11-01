@@ -23,7 +23,6 @@ package org.homedns.mkh.ui.client.frame;
  * Tabs style content panel
  *
  */
-@SuppressWarnings( "unchecked" )
 public class ContentPanel extends TabsPanel implements Content {
 
 	public ContentPanel( ) {

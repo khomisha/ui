@@ -40,7 +40,7 @@ public class SimpleContentPanel extends AccordionPanel {
 	 * @see org.homedns.mkh.ui.client.frame.AccordionPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		super.init( );
 		Grid grid = createView( Grid.class, getViewName( ), "list" );
 		createView( GridForm.class, grid.getID( ), "edit" );

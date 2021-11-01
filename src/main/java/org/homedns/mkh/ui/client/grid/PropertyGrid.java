@@ -44,7 +44,6 @@ import com.gwtext.client.widgets.grid.PropertyGridPanel;
  * Property grid
  *
  */
-@SuppressWarnings( "unchecked" )
 public class PropertyGrid extends PropertyGridPanel implements View, HasButton {
 	private PropertyGridImpl impl;
 	private Id id;

@@ -27,7 +27,6 @@ import com.gwtext.client.widgets.layout.RowLayoutData;
 /**
 * Container with border layout contains center panel and second panel
 */
-@SuppressWarnings( "unchecked" )
 public class RowLayoutPanel extends GenericPanel {
 
 	private int iCompletedCount = 0;
@@ -90,7 +89,7 @@ public class RowLayoutPanel extends GenericPanel {
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		Panel firstPanel = new Panel( );
 		firstPanel.setLayout( new FitLayout( ) );
 		firstPanel.setBorder( false );

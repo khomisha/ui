@@ -75,7 +75,7 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	 * 
 	 * @return the panel
 	 */
-	protected Panel getPanel( String sKey ) {
+	public Panel getPanel( String sKey ) {
 		return( registry.get( sKey ) );
 	}
 
@@ -94,7 +94,7 @@ public abstract class GenericPanel extends Panel implements ViewAccess, HasButto
 	/**
 	 * Inits panel
 	 */
-	protected void init( ) {
+	public void init( ) {
 	}
 	
 	/**

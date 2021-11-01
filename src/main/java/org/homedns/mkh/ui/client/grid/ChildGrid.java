@@ -43,7 +43,6 @@ import com.gwtext.client.data.Record;
  * Child grid, depends on master grid
  * 
  */
-@SuppressWarnings( "unchecked" )
 public class ChildGrid extends Grid implements ChildView, SelectRowHandler, RPCResponseHandler, HandlerRegistry {
 	private static final Logger LOG = Logger.getLogger( ChildGrid.class.getName( ) );  
 

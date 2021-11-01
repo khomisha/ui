@@ -45,7 +45,6 @@ import com.gwtext.client.widgets.grid.EditorGridPanel;
  * Editable grid
  *
  */
-@SuppressWarnings( "unchecked" )
 public class EditorGrid extends EditorGridPanel implements Paging, HasButton {
 	public static final int REMOVED = 0;
 	public static final int ADDED = 1;

@@ -41,7 +41,6 @@ import com.gwtext.client.data.Record;
  * Child editable grid, depends on master grid
  * 
  */
-@SuppressWarnings( "unchecked" )
 public class ChildEditorGrid extends EditorGrid implements ChildView, SelectRowHandler, RPCResponseHandler, HandlerRegistry {
 	private HandlerRegistryAdaptee handlers;
 	private String sMasterPK;

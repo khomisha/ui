@@ -44,7 +44,6 @@ import com.gwtext.client.widgets.grid.GridPanel;
  * Grid
  *
  */
-@SuppressWarnings( "unchecked" )
 public class Grid extends GridPanel implements Paging, HasButton {	
 	private GridImpl impl;
 	private Id id;

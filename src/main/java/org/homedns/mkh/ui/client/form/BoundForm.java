@@ -215,6 +215,24 @@ public class BoundForm extends BaseForm implements View {
 	}
 
 	/**
+	 * Fills panel with specified fields
+	 * 
+	 * @param fields
+	 *            the fields array
+	 * 
+	 * @return the panel with fields
+	 */
+	public Panel fillPanel( Field[] fields ) {
+		Panel panel = new Panel( );			
+		panel.setLayout( new FormLayout( ) );
+		panel.setBorder( false );
+		for( Field field : fields ) {
+			panel.add( field, new AnchorLayoutData( "95%" ) );
+		}
+		return( panel );
+	}
+
+	/**
 	 * Fills specified panel with fields
 	 * 
 	 * @param panel

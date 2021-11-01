@@ -32,7 +32,6 @@ import com.gwtext.client.widgets.layout.AnchorLayoutData;
  * Edit grid field form
  *
  */
-@SuppressWarnings( "unchecked" )
 public class EditFieldForm extends BaseForm implements RPCResponseHandler, HandlerRegistry {
 	private static final UIConstants CONSTANTS = ( UIConstants )AbstractEntryPoint.getConstants( );
 

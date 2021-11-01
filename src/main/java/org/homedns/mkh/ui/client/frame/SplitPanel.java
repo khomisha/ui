@@ -28,7 +28,6 @@ import com.gwtext.client.widgets.layout.BorderLayout;
  * It supports multiple nested panels, automatic split bars between regions and
  * built-in expanding and collapsing of regions
  */
-@SuppressWarnings( "unchecked" )
 public class SplitPanel extends GenericPanel {
 	public static final String NORTH = "north";
 	public static final String SOUTH = "south";
@@ -50,7 +49,7 @@ public class SplitPanel extends GenericPanel {
 	 * @see org.homedns.mkh.ui.client.frame.GenericPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		super.init( );
 		Set< String > names = configs.keySet( );
 		for( String sName : names ) {

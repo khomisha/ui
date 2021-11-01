@@ -60,7 +60,7 @@ public class BorderContentPanel extends BorderLayoutPanel {
 	 * @see org.homedns.mkh.ui.client.frame.BorderLayoutPanel#init()
 	 */
 	@Override
-	protected void init( ) {
+	public void init( ) {
 		super.init( );
 		View view = null;
 		ViewTag tag = getViewTag( ).get( 0 );
