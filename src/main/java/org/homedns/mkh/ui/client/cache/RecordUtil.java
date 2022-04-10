@@ -101,7 +101,7 @@ public class RecordUtil {
 			sb.append( "[" );
 			for( Record rec : aRecord ) {
 				String s = getJson( rec.getJsObj( ) );
-				LOG.config( "json: " + s );
+				LOG.config( LOG.getName( ) + ": getJsonData: json: " + s );
 				sb.append( s );
 				if( iRecord < aRecord.length - 1 ) {
 					sb.append( "," );
@@ -109,7 +109,7 @@ public class RecordUtil {
 				iRecord++;
 			}
 			sb.append( "]" );
-			LOG.config( sb.toString( ) );
+			LOG.config( LOG.getName( ) + ": getJsonData: " + sb.toString( ) );
 		}
 		catch( Exception e ) {
 			LOG.log( 

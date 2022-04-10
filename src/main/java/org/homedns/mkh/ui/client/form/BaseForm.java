@@ -77,9 +77,7 @@ public class BaseForm extends FormPanel {
 	 */
 	public void addButtons( CmdTypeItem[] items ) {
 		for( CmdTypeItem item : items ) {
-			final Command cmd = CommandFactory.create( 
-				item.getCommandType( ), this 
-			);
+			final Command cmd = CommandFactory.create( item.getCommandType( ), this ); 		// ??? this can't universal command parameter
 			final FormButton btn = new FormButton( item.getName( ), cmd );
 			btn.addListener(
 				new ButtonListenerAdapter( ) {
