@@ -9,7 +9,7 @@
   <groupId>org.homedns.mkh</groupId>
   <artifactId>ui</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.7</version>
+  <version>1.1.0</version>
 
   	<name>UI widgets library</name>
     <description>Gwt-Ext based UI widgets collection. It is ready for use with Dataservice Library (https://github.com/khomisha/dataservice) for building GWT applications</description>
@@ -41,7 +41,7 @@
     <dependency>
     	<groupId>org.homedns.mkh</groupId>
     	<artifactId>dataservice</artifactId>
-    	<version>1.0.10</version>
+    	<version>1.1.0</version>
     </dependency>
     <dependency>
     	<groupId>com.gwtext</groupId>
